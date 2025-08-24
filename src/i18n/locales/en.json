@@ -1,0 +1,112 @@
+{
+  "common": {
+    "showMore": "Show More",
+    "showLess": "Show Less"
+  },
+  "seo": {
+    "siteTitle": "Mohammad Hassan Shiri (Hasan Shiri) | Portfolio",
+    "siteDescription": "Mohammad Hassan Shiri (MHS) - Physics Student at Sharif University, Data Scientist & Complex Systems Researcher. Known as Hasan Shiri, expertise in Data Analysis and Machine Learning.",
+    "keywords": "Mohammad Hassan Shiri, Mohamad Hasan Shiri, Muhamed Hasan Shiri, Hasan Shiri, MHS, Muhammad Hassan Shiri, محمدحسن شیری, محمد حسن شیری, حسن شیری, Shiri, Physics Student, Data Scientist, Sharif University, Complex Systems, Python, Data Analysis, Machine Learning, AI"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "contact": "Contact"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "name": "Mohammad Hassan Shiri",
+    "firstName": "Mohammad Hassan",
+    "lastName": "Shiri",
+    "title": "Analytical Researcher | Complex Systems Enthusiast | Data Scientist",
+    "description": "An inquisitive Physics undergraduate at Sharif University with a deep-seated passion for modeling complex systems and leveraging data to uncover foundational insights.",
+    "getInTouch": "Get In Touch",
+    "downloadCV": "Download CV"
+  },
+  "about": {
+    "title": "About",
+    "me": "Me",
+    "subtitle": "Analytical Researcher | Complex Systems Enthusiast | Data Scientist",
+    "paragraph1": "I'm currently pursuing a Physics degree at Sharif University of Technology (2023-2027), building upon my Computer Engineering background from University of Isfahan (2019-2023). This unique combination of technical expertise allows me to approach complex problems from both computational and theoretical physics perspectives.",
+    "paragraph2": "My professional journey includes serving as a Commercial Specialist at Kavosh Energy Pasargad (late 2020-2021) and currently working as a Commercial Specialist and Deputy Inspector at Sakht Kooshan Matin Company (2022-present). These experiences have sharpened my analytical skills in business process optimization, market research, and international trade, which I now apply to data science and complex systems modeling.",
+    "getInTouch": "Get In Touch",
+    "downloadCV": "Download CV",
+    "dataScience": {
+      "title": "Data Science",
+      "description": "Analyzing complex datasets to extract actionable insights and drive data-informed decision-making. Python (pandas, NumPy, Matplotlib, Scikit-learn), Power BI, Advanced Excel"
+    },
+    "toolsDevOps": {
+      "title": "Tools & DevOps and Programming",
+      "description": "Familiar with a variety of tools and technologies, including Docker, Kubernetes, and CI/CD pipelines, to streamline development workflows and enhance collaboration."
+    },
+    "domainKnowledge": {
+      "title": "Domain Knowledge",
+      "description": "Market Research, International Trade, Business Process Modeling"
+    }
+  },
+  "skills": {
+    "title": "My",
+    "skills": "Skills",
+    "categories": {
+      "all": "all",
+      "dataScience": "data-science",
+      "programming": "programming",
+      "tools": "tools",
+      "research": "research",
+      "languages": "languages"
+    }
+  },
+  "projects": {
+    "title": "Featured",
+    "projects": "Projects",
+    "description": "Here are some of my recent projects. Each project was carefully crafted with attention to detail, performance, and user experience.",
+    "checkGithub": "Check My Github",
+    "watchVideos": "Watch My Videos",
+    "viewDockerImages": "View Docker Images",
+    "readMyArticles": "Read My Articles",
+    "projectDescriptions": {
+      "projectLibertad": "A dual-purpose Python project featuring a Dockerized Telegram proxy scraper with email/group notifications, and a one-time script for securely distributing SSH credentials to group members.",
+      "interpolationTechniques": "A basic representation of spline and Newtonian interpolation with performance test using Transcendental functions - using python",
+      "restaurantDataAnalysis": "A comprehensive data analysis project focused on restaurant performance metrics.",
+      "sshVpn": "A decentralized and containerized SSH VPN solution built on the RunOnFlux platform.",
+      "nasta": "A multi-purpose script pack and modules used for Data analysis on NASA API outputs",
+      "tgReminder": "A personalized telegram reminder bot using telebot - english /persian support",
+      "oscillationSimulation": "A comprehensive computational physics project that simulates wave dynamics through coupled oscillator systems, exploring normal modes, symmetry effects, and wave propagation phenomena.",
+      "skmWebsite": "A comprehensive website project for SKM construction company, showcasing their services, projects, and client testimonials.",
+      "uissf": "Research proposal for a global distributed network of smart campuses for University of Isfahan engineering faculties. UISSF combines P2P file storage, indoor positioning systems, and immersive technologies (AR/VR/MR) to create fundamental infrastructure for AI, IoT, computer vision, and digital evolution technologies."
+    }
+  },
+  "contact": {
+    "title": "Get In",
+    "touch": "Touch",
+    "description": "Have a project in mind or want to collaborate? Feel free to reach out. I'm always open to discussing new opportunities.",
+    "contactInformation": "Contact Information",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location",
+    "locationValue": "Tehran, Tehran, Iran",
+    "connectWithMe": "Connect With Me",
+    "sendMessage": "Send a Message",
+    "form": {
+      "name": "Your Name",
+      "namePlaceholder": "Hasan Shiri...",
+      "email": "Your Email",
+      "emailPlaceholder": "sandmanshiri@gmail.com",
+      "message": "Your Message",
+      "messagePlaceholder": "Hello, I'd like to talk about...",
+      "sending": "Sending...",
+      "sendMessage": "Send Message"
+    },
+    "toast": {
+      "success": "Message sent successfully!",
+      "successDescription": "Thank you for your message. I'll get back to you soon.",
+      "error": "Failed to send message",
+      "errorDescription": "There was an error sending your message. Please try again or contact me directly."
+    }
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  }
+}
