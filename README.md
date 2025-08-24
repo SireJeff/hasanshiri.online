@@ -1,103 +1,44 @@
-# hasanshiri.online - Personal Blog & Portfolio
+# hasanshiri.online
 
-<div align="center">
-  <br />
-  <img src="./banner.png" alt="Hasan Shiri's Personal Blog & Portfolio">
-  <br />
-  <div>
-    <img src="https://img.shields.io/badge/-React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
-    <img src="https://img.shields.io/badge/-TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss" alt="Tailwind CSS" />
-    <img src="https://img.shields.io/badge/-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
-    <img src="https://img.shields.io/badge/-Lucide Icons-FD4D4D?style=for-the-badge&logo=lucide" alt="Lucide Icons" />
-    <img src="https://img.shields.io/badge/-Radix UI-9D4EDD?style=for-the-badge&logo=data:image/svg+xml;base64..." alt="Radix UI" />
-  </div>
-  <h3 align="center">Mohammad Hassan Shiri's Personal Website - Featuring Projects, Research, and Thoughts</h3>
-  <div align="center">
-    <a href="https://hasanshiri.online" target="_blank"><b>Visit Website</b></a>
-  </div>
-  <br />
-</div>
+My personal website and portfolio, showcasing my work in Data Science, Physics, and Complex Systems. Visit at [hasanshiri.online](https://hasanshiri.online).
 
-## 📋 Table of Contents
+## About
 
-1. [Introduction](#-introduction)
-2. [Tech Stack](#-tech-stack)
-3. [Features](#-features)
-4. [Quick Start](#-quick-start)
-5. [Screenshots](#-screenshots)
-6. [Deployment](#-deployment)
+I'm Mohammad Hassan Shiri, a Researcher and Data Scientist at Sharif University of Technology. This website serves as a platform to share my:
 
----
+- � Research work in Physics and Complex Systems
+- 📊 Data Science projects and analyses
+- 💡 Thoughts and insights in the field
+- 📚 Academic background and achievements
 
-## 🚀 Introduction
+## Tech Stack
 
-In this tutorial, you'll learn how to build a modern portfolio website using **React**, **TailwindCSS**, **Vite**, and **Lucide Icons**. From dark mode support to responsive animations and deployable project showcases, this video walks you through every step—perfect for developers looking to level up their frontend skills or apply for jobs.
+Built with modern web technologies:
 
-🎥 Watch the full tutorial: [YouTube](https://youtu.be/YOUR_VIDEO_ID)
+- React + Vite
+- TailwindCSS
+- i18next (Bilingual Support 🇺🇸 🇮🇷)
+- Radix UI Components
 
----
-
-## ⚙️ Tech Stack
-
-* **React** – Component-based UI development
-* **Vite** – Lightning-fast build tool
-* **TailwindCSS** – Utility-first CSS for styling
-* **Lucide Icons** – Clean and beautiful icon pack
-* **Radix UI** – Accessible component primitives
-* **TypeScript (optional)** – Type safety and tooling
-* **GitHub & Vercel** – Deployment
-
----
-
-## ⚡️ Features
-
-* 🌑 **Light/Dark Mode Toggle**
-  Save theme preference in local storage with beautiful transitions
-
-* 💫 **Animated Backgrounds**
-  Stars, meteors, scroll effects, and glowing UI elements
-
-* 📱 **Responsive Navigation**
-  Desktop and mobile menus with glassmorphism
-
-* 👨‍💻 **Hero & About Sections**
-  Showcase who you are with smooth intro animations and buttons
-
-* 📊 **Skills Grid**
-  Filterable progress bars and categories with animated width
-
-* 🖼️ **Projects Showcase**
-  Display screenshots, tech stacks, and GitHub/demo links
-
-* 📩 **Contact Section**
-  Social icons + responsive contact form with toast notifications
-
-* 🚀 **One-Click Deployment**
-  Easily host your site with Vercel and GitHub
-
----
-
-## 👌 Quick Start
-
-### Prerequisites
-
-* [Node.js](https://nodejs.org/)
-* [Git](https://git-scm.com/)
-
-### Clone and Run
+## Local Development
 
 ```bash
-git clone https://github.com/yourusername/react-tailwind-portfolio.git
-cd react-tailwind-portfolio
+# Clone the repository
+git clone https://github.com/SireJeff/hasanshiri.online.git
+
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
 ```
 
-Your app will be available at: [http://localhost:5173](http://localhost:5173)
+## Contact
 
----
-
-## 🖼️ Screenshots
+Feel free to reach out:
+- � Email: sandmanshiri@gmail.com
+- � LinkedIn: [mohammad-hasan-shiri-35b21119a](https://www.linkedin.com/in/mohammad-hasan-shiri-35b21119a)
+- 🐦 Twitter: [@jeffthedeafreff](https://x.com/jeffthedeafreff)
 
 > 📸 Add screenshots of your Hero section, Projects grid, and Contact form here to show off your site.
 
