@@ -77,7 +77,7 @@ export function ShareButtons({ title, url, locale = 'en' }) {
 }
 
 // Vertical share buttons for sidebar
-export function ShareButtonsVertical({ title, url, locale = 'en' }) {
+export function ShareButtonsVertical({ title, url }) {
   const [copied, setCopied] = useState(false)
 
   const encodedTitle = encodeURIComponent(title)

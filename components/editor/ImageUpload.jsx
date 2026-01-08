@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useRef } from 'react'
 import Image from 'next/image'
-import { Upload, X, Loader2, Image as ImageIcon, Trash2 } from 'lucide-react'
-import { uploadImage, deleteImage } from '@/lib/actions/storage'
+import { Upload, Loader2, Image as ImageIcon, Trash2 } from 'lucide-react'
+import { uploadImage } from '@/lib/actions/storage'
 
 export function ImageUpload({
   value,

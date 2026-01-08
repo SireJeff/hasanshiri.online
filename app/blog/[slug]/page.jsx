@@ -6,6 +6,7 @@ import { ArticleContent } from '@/components/blog/ArticleContent'
 import { TableOfContentsCompact } from '@/components/blog/TableOfContents'
 import { ShareButtons, ShareButtonsVertical } from '@/components/blog/ShareButtons'
 import { RelatedArticles } from '@/components/blog/RelatedArticles'
+import { CommentSection } from '@/components/comments/CommentSection'
 import { ArrowLeft, Calendar, Clock, Eye, User } from 'lucide-react'
 import { headers } from 'next/headers'
 
@@ -268,6 +269,9 @@ export default async function ArticlePage({ params }) {
 
             {/* Related Articles */}
             <RelatedArticles articles={relatedArticles} locale={locale} />
+
+            {/* Comments Section */}
+            <CommentSection articleId={article.id} locale={locale} />
           </article>
 
           {/* Sidebar - TOC & Share */}

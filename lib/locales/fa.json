@@ -108,5 +108,38 @@
   },
   "footer": {
     "rights": "© 2025 محمدحسن شیری. تمام حقوق محفوظ است."
+  },
+  "comments": {
+    "title": "نظرات",
+    "noComments": "هنوز نظری ثبت نشده است. اولین نفر باشید!",
+    "signInPrompt": "برای تجربه بهتر، با گیت‌هاب وارد شوید",
+    "signIn": "ورود",
+    "postComment": "ارسال نظر",
+    "postReply": "ارسال پاسخ",
+    "posting": "در حال ارسال...",
+    "cancel": "انصراف",
+    "reply": "پاسخ",
+    "edit": "ویرایش",
+    "delete": "حذف",
+    "save": "ذخیره",
+    "saving": "ذخیره...",
+    "author": "نویسنده",
+    "justNow": "همین الان",
+    "minutesAgo": "{{count}} دقیقه پیش",
+    "hoursAgo": "{{count}} ساعت پیش",
+    "daysAgo": "{{count}} روز پیش",
+    "edited": "ویرایش شده",
+    "replyTo": "پاسخ به {{name}}...",
+    "commentingAs": "نظر دادن به عنوان",
+    "yourName": "نام شما *",
+    "yourEmail": "ایمیل شما *",
+    "sharePlaceholder": "نظر خود را بنویسید...",
+    "replyPlaceholder": "پاسخ خود را بنویسید...",
+    "emailNotPublished": "ایمیل شما منتشر نخواهد شد. نظرات جدید پس از تایید نمایش داده می‌شوند.",
+    "enterComment": "لطفا نظر خود را وارد کنید",
+    "nameEmailRequired": "نام و ایمیل الزامی است",
+    "awaitingModeration": "نظر شما در انتظار تایید است و پس از بررسی نمایش داده خواهد شد.",
+    "commentPosted": "نظر شما با موفقیت ثبت شد!",
+    "confirmDelete": "آیا مطمئن هستید که می‌خواهید این نظر را حذف کنید؟"
   }
 }

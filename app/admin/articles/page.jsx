@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getAdminArticles, deleteArticle, toggleArticleFeatured } from '@/lib/actions/articles'
-import { Plus, Edit, Trash2, Eye, Star, ExternalLink, Search } from 'lucide-react'
+import { getAdminArticles } from '@/lib/actions/articles'
+import { Plus, Star, Search } from 'lucide-react'
 import { ArticleActions } from './article-actions'
 
 export const metadata = {
