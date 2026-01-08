@@ -1,71 +1,138 @@
 # hasanshiri.online
 
-My personal website and portfolio, showcasing my work in Data Science, Physics, and Complex Systems. Visit at [hasanshiri.online](https://hasanshiri.online).
+A modern bilingual blog and portfolio platform built with Next.js 14 and Supabase.
 
-## About
+**Live Site:** [hasanshiri.online](https://hasanshiri.online)
 
-I'm Mohammad Hassan Shiri, a Researcher and Data Scientist at Sharif University of Technology. This website serves as a platform to share my:
+## Features
 
-- � Research work in Physics and Complex Systems
-- 📊 Data Science projects and analyses
-- 💡 Thoughts and insights in the field
-- 📚 Academic background and achievements
+- **Bilingual Support** - Full English and Persian (Farsi) with RTL support
+- **Blog Platform** - Full CRUD for articles with TipTap rich text editor
+- **Comments System** - Threaded comments with guest and authenticated users
+- **Real-time Chat** - Floating chat widget with admin dashboard
+- **Admin Dashboard** - Manage articles, comments, categories, tags, media, and settings
+- **SEO Optimized** - Dynamic sitemap, robots.txt, JSON-LD structured data, hreflang tags
+- **Dark/Light Mode** - Theme toggle with system preference detection
+- **Analytics** - Vercel Analytics and Speed Insights integration
+- **Error Tracking** - Sentry integration (optional)
 
 ## Tech Stack
 
-Built with modern web technologies:
+- **Framework:** Next.js 14 (App Router)
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth (Email + GitHub OAuth)
+- **Styling:** Tailwind CSS
+- **Editor:** TipTap
+- **Hosting:** Vercel
+- **Testing:** Jest + React Testing Library, Playwright (E2E)
 
-- React + Vite
-- TailwindCSS
-- i18next (Bilingual Support 🇺🇸 🇮🇷)
-- Radix UI Components
+## Project Structure
 
-## Local Development
-
-```bash
-# Clone the repository
-git clone https://github.com/SireJeff/hasanshiri.online.git
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
+```
+├── app/                  # Next.js App Router pages
+│   ├── [locale]/         # Localized public pages (en, fa)
+│   ├── admin/            # Admin dashboard
+│   ├── auth/             # Authentication pages
+│   └── api/              # API routes
+├── components/           # React components
+├── lib/                  # Utilities and actions
+│   ├── actions/          # Server actions
+│   └── supabase/         # Supabase client setup
+├── public/               # Static assets
+├── supabase/             # Database schema
+├── __tests__/            # Unit tests
+├── e2e/                  # E2E tests
+└── docs/                 # Documentation
 ```
 
-## Contact
+## Getting Started
 
-Feel free to reach out:
-- � Email: sandmanshiri@gmail.com
-- � LinkedIn: [mohammad-hasan-shiri-35b21119a](https://www.linkedin.com/in/mohammad-hasan-shiri-35b21119a)
-- 🐦 Twitter: [@jeffthedeafreff](https://x.com/jeffthedeafreff)
+### Prerequisites
 
-> 📸 Add screenshots of your Hero section, Projects grid, and Contact form here to show off your site.
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- Vercel account (for deployment)
 
----
+### Local Development
 
-## ☁️ Deployment
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SireJeff/hasanshiri.online.git
+   cd hasanshiri.online
+   ```
 
-### Deploy on Vercel
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Import your repository
-4. Click **Deploy**
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   ```
 
-Your live website will be hosted on a custom subdomain (e.g. `https://your-name.vercel.app`)
+   Fill in your Supabase credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   ```
 
----
+4. **Set up Supabase database**
+   - Create a new Supabase project
+   - Run `supabase/schema.sql` in the SQL Editor
+   - Create storage buckets: `articles` and `avatars` (public)
 
-## 🔗 Useful Links
+5. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-* [React Documentation](https://reactjs.org/)
-* [Tailwind CSS Docs](https://tailwindcss.com/)
-* [Lucide Icons](https://lucide.dev/)
-* [Radix UI](https://www.radix-ui.com/)
-* [Vite](https://vitejs.dev/)
-* [Vercel](https://vercel.com/)
+6. **Open browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
----
+## Scripts
 
-Let me know if you'd like me to generate a version with your actual GitHub repo, YouTube URL, or a banner image suggestion!
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run unit tests |
+| `npm run test:coverage` | Run tests with coverage |
+| `npm run test:e2e` | Run E2E tests |
+
+## Documentation
+
+- [Complete Setup Guide](docs/COMPLETE_SETUP_GUIDE.md) - Full Supabase + Vercel setup
+- [Testing & Launch Guide](docs/TESTING_AND_LAUNCH.md) - Testing setup and pre-launch checklist
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Connect your GitHub repository to Vercel
+2. Add environment variables in Vercel dashboard
+3. Deploy
+
+Required environment variables:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+
+## Author
+
+**Mohammad Hassan Shiri**
+
+- Website: [hasanshiri.online](https://hasanshiri.online)
+- Email: sandmanshiri@gmail.com
+- LinkedIn: [mohammad-hasan-shiri-35b21119a](https://www.linkedin.com/in/mohammad-hasan-shiri-35b21119a)
+- Twitter: [@jeffthedeafreff](https://x.com/jeffthedeafreff)
+
+## License
+
+This project is private. All rights reserved.
