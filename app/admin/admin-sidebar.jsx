@@ -13,8 +13,11 @@ import {
   LogOut,
   Menu,
   X,
+  Image,
+  Moon,
+  Sun,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
@@ -23,6 +26,7 @@ const navItems = [
   { name: 'Articles', href: '/admin/articles', icon: FileText },
   { name: 'Comments', href: '/admin/comments', icon: MessageSquare },
   { name: 'Chat', href: '/admin/chat', icon: MessagesSquare },
+  { name: 'Media', href: '/admin/media', icon: Image },
   { name: 'Categories', href: '/admin/categories', icon: FolderOpen },
   { name: 'Tags', href: '/admin/tags', icon: Tags },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
@@ -32,7 +36,24 @@ export function AdminSidebar({ user, profile }) {
   const pathname = usePathname()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isDark, setIsDark] = useState(false)
   const supabase = createClient()
+
+  // Initialize dark mode state from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isDarkMode = savedTheme === 'dark' || (!savedTheme && prefersDark)
+    setIsDark(isDarkMode)
+    document.documentElement.classList.toggle('dark', isDarkMode)
+  }, [])
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDark
+    setIsDark(newDarkMode)
+    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light')
+    document.documentElement.classList.toggle('dark', newDarkMode)
+  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -46,7 +67,7 @@ export function AdminSidebar({ user, profile }) {
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 bg-card border border-border rounded-lg"
+          className="p-2 bg-card border border-border rounded-lg shadow-sm"
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -95,14 +116,48 @@ export function AdminSidebar({ user, profile }) {
           </nav>
 
           {/* User section */}
-          <div className="p-4 border-t border-border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <div className="p-4 border-t border-border space-y-4">
+            {/* Dark mode toggle */}
+            <button
+              onClick={toggleDarkMode}
+              className="w-full flex items-center justify-between px-4 py-2 bg-secondary/50 hover:bg-secondary rounded-lg transition-colors"
+            >
+              <span className="flex items-center gap-3 text-sm text-foreground">
+                {isDark ? (
+                  <>
+                    <Moon size={18} className="text-blue-400" />
+                    Dark Mode
+                  </>
+                ) : (
+                  <>
+                    <Sun size={18} className="text-yellow-500" />
+                    Light Mode
+                  </>
+                )}
+              </span>
+              <div
+                className={cn(
+                  'relative w-10 h-5 rounded-full transition-colors',
+                  isDark ? 'bg-primary' : 'bg-muted'
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform',
+                    isDark ? 'translate-x-5' : 'translate-x-0.5'
+                  )}
+                />
+              </div>
+            </button>
+
+            {/* User info */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
                 {profile?.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt={profile.full_name || user.email}
-                    className="w-full h-full rounded-full object-cover"
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   <span className="text-primary font-medium">
@@ -118,6 +173,7 @@ export function AdminSidebar({ user, profile }) {
               </div>
             </div>
 
+            {/* Sign out */}
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
