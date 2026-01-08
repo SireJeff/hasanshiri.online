@@ -126,17 +126,25 @@ export async function middleware(request) {
       if (!pathnameHasLocale) {
         // No locale in pathname, redirect to preferred locale
         const preferredLocale = getPreferredLocale(request)
-        const newUrl = new URL(`/${preferredLocale}${pathname}`, request.url)
-        newUrl.search = request.nextUrl.search
 
-        const response = NextResponse.redirect(newUrl)
-        response.cookies.set('NEXT_LOCALE', preferredLocale, {
-          maxAge: 60 * 60 * 24 * 365,
-          path: '/',
-          sameSite: 'lax',
-        })
+        // Safely construct the new URL
+        try {
+          const newUrl = new URL(`/${preferredLocale}${pathname}`, request.url)
+          newUrl.search = request.nextUrl.search
 
-        return response
+          const response = NextResponse.redirect(newUrl)
+          response.cookies.set('NEXT_LOCALE', preferredLocale, {
+            maxAge: 60 * 60 * 24 * 365,
+            path: '/',
+            sameSite: 'lax',
+          })
+
+          return response
+        } catch (urlError) {
+          console.error('Error constructing redirect URL:', urlError)
+          // Fallback: redirect to default locale root
+          return NextResponse.redirect(new URL(`/${i18nConfig.defaultLocale}`, request.url))
+        }
       }
     }
 
@@ -148,7 +156,10 @@ export async function middleware(request) {
 
     return response
   } catch (error) {
-    console.error('Middleware error:', error)
+    console.error('Middleware error:', error, {
+      pathname: request.nextUrl?.pathname,
+      url: request.url,
+    })
     // Return a basic response to prevent 500 error
     return NextResponse.next()
   }
