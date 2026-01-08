@@ -1,8 +1,8 @@
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-const inter = Inter({ subsets: ['latin'] })
+// System font class
+const fontClass = 'font-sans'
 
 export const metadata = {
   title: {
@@ -51,7 +51,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={fontClass}>
         <Providers>
           <div className="min-h-screen bg-background text-foreground relative">
             {children}
