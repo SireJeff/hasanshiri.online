@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-export function Pagination({ currentPage, totalPages, basePath = '/blog' }) {
+export function Pagination({ currentPage, totalPages, locale = 'en' }) {
   const searchParams = useSearchParams()
+  const isRtl = locale === 'fa'
+  const basePath = `/${locale}/blog`
 
   if (totalPages <= 1) return null
 
@@ -62,25 +64,29 @@ export function Pagination({ currentPage, totalPages, basePath = '/blog' }) {
   const pageNumbers = getPageNumbers()
 
   return (
-    <nav className="flex items-center justify-center gap-1" aria-label="Pagination">
+    <nav
+      className={`flex items-center justify-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}
+      aria-label="Pagination"
+      dir={isRtl ? 'rtl' : 'ltr'}
+    >
       {/* Previous Button */}
       {currentPage > 1 ? (
         <Link
           href={buildUrl(currentPage - 1)}
-          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+          className={`flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
         >
-          <ChevronLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Previous</span>
+          <ChevronLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
+          <span className="hidden sm:inline">{isRtl ? 'قبلی' : 'Previous'}</span>
         </Link>
       ) : (
-        <span className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground/50 cursor-not-allowed">
-          <ChevronLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Previous</span>
+        <span className={`flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground/50 cursor-not-allowed ${isRtl ? 'flex-row-reverse' : ''}`}>
+          <ChevronLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
+          <span className="hidden sm:inline">{isRtl ? 'قبلی' : 'Previous'}</span>
         </span>
       )}
 
       {/* Page Numbers */}
-      <div className="flex items-center gap-1">
+      <div className={`flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
         {pageNumbers.map((page, index) => {
           if (page === '...') {
             return (
@@ -94,13 +100,14 @@ export function Pagination({ currentPage, totalPages, basePath = '/blog' }) {
           }
 
           const isActive = page === currentPage
+          const displayPage = isRtl ? page.toLocaleString('fa-IR') : page
 
           return isActive ? (
             <span
               key={page}
               className="px-3 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg"
             >
-              {page}
+              {displayPage}
             </span>
           ) : (
             <Link
@@ -108,7 +115,7 @@ export function Pagination({ currentPage, totalPages, basePath = '/blog' }) {
               href={buildUrl(page)}
               className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
             >
-              {page}
+              {displayPage}
             </Link>
           )
         })}
@@ -118,15 +125,15 @@ export function Pagination({ currentPage, totalPages, basePath = '/blog' }) {
       {currentPage < totalPages ? (
         <Link
           href={buildUrl(currentPage + 1)}
-          className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+          className={`flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
         >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight className="w-4 h-4" />
+          <span className="hidden sm:inline">{isRtl ? 'بعدی' : 'Next'}</span>
+          <ChevronRight className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
         </Link>
       ) : (
-        <span className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground/50 cursor-not-allowed">
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight className="w-4 h-4" />
+        <span className={`flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground/50 cursor-not-allowed ${isRtl ? 'flex-row-reverse' : ''}`}>
+          <span className="hidden sm:inline">{isRtl ? 'بعدی' : 'Next'}</span>
+          <ChevronRight className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
         </span>
       )}
     </nav>
