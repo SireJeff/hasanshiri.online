@@ -124,14 +124,24 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
         </div>
 
         <div className="flex items-center gap-2">
-          {article?.status === 'published' && (
+          {article && (
             <Link
-              href={`/blog/${article.slug}`}
+              href={`/admin/articles/${article.id}/preview`}
               target="_blank"
               className="flex items-center gap-2 px-4 py-2 text-sm bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
             >
               <Eye className="w-4 h-4" />
               Preview
+            </Link>
+          )}
+          {article?.status === 'published' && (
+            <Link
+              href={`/blog/${article.slug}`}
+              target="_blank"
+              className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              title="View live article"
+            >
+              View Live
             </Link>
           )}
           <button
