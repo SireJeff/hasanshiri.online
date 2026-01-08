@@ -3,7 +3,7 @@ import { useTheme } from '@/lib/ThemeProvider';
 import { Shuffle } from 'lucide-react';
 
 export const ThemeColorToggle = () => {
-  const { currentTheme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
 
   const handleRandomTheme = () => {
     const newTheme = getRandomTheme();

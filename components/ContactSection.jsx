@@ -37,7 +37,7 @@ export const ContactSection = () => {
         throw new Error('EmailJS configuration missing. Please check your environment variables.');
       }
 
-      const result = await emailjs.sendForm(
+      await emailjs.sendForm(
         serviceId,
         templateId,
         e.target,

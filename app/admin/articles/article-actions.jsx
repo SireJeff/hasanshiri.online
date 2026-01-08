@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { deleteArticle, toggleArticleFeatured } from '@/lib/actions/articles'
-import { Edit, Trash2, Eye, Star, ExternalLink, MoreHorizontal, Loader2 } from 'lucide-react'
+import { Edit, Trash2, Star, ExternalLink, MoreHorizontal, Loader2 } from 'lucide-react'
 
 export function ArticleActions({ article }) {
   const router = useRouter()
