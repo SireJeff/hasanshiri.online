@@ -18,14 +18,18 @@ function getPreferredLocale(request) {
 
     // Check Accept-Language header
     const acceptLanguage = request.headers.get('Accept-Language')
-    if (acceptLanguage) {
+    if (acceptLanguage && typeof acceptLanguage === 'string') {
       const languages = acceptLanguage.split(',').map((lang) => {
-        const [code, priority] = lang.trim().split(';q=')
-        return {
-          code: code.split('-')[0].toLowerCase(),
-          priority: priority ? parseFloat(priority) : 1,
+        try {
+          const [code, priority] = lang.trim().split(';q=')
+          return {
+            code: code.split('-')[0].toLowerCase(),
+            priority: priority ? parseFloat(priority) : 1,
+          }
+        } catch {
+          return null
         }
-      })
+      }).filter(Boolean)
 
       // Sort by priority
       languages.sort((a, b) => b.priority - a.priority)
@@ -127,38 +131,41 @@ export async function middleware(request) {
         // No locale in pathname, redirect to preferred locale
         const preferredLocale = getPreferredLocale(request)
 
-        // Safely construct the new URL
-        try {
-          const newUrl = new URL(`/${preferredLocale}${pathname}`, request.url)
-          newUrl.search = request.nextUrl.search
+        // Build redirect path - ensure no double slashes
+        const redirectPath = pathname === '/'
+          ? `/${preferredLocale}`
+          : `/${preferredLocale}${pathname}`
 
-          const response = NextResponse.redirect(newUrl)
-          response.cookies.set('NEXT_LOCALE', preferredLocale, {
-            maxAge: 60 * 60 * 24 * 365,
-            path: '/',
-            sameSite: 'lax',
-          })
+        // Use request.nextUrl for safer URL construction
+        const url = request.nextUrl.clone()
+        url.pathname = redirectPath
 
-          return response
-        } catch (urlError) {
-          console.error('Error constructing redirect URL:', urlError)
-          // Fallback: redirect to default locale root
-          return NextResponse.redirect(new URL(`/${i18nConfig.defaultLocale}`, request.url))
-        }
+        const response = NextResponse.redirect(url)
+        response.cookies.set('NEXT_LOCALE', preferredLocale, {
+          maxAge: 60 * 60 * 24 * 365,
+          path: '/',
+          sameSite: 'lax',
+        })
+
+        return response
       }
     }
 
     // Create base response
-    let response = NextResponse.next({ request })
+    const response = NextResponse.next()
 
-    // Handle Supabase session for all routes
-    response = await handleSupabaseSession(request, response)
+    // Handle Supabase session for all routes (only if env vars are configured)
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return await handleSupabaseSession(request, response)
+    }
 
     return response
   } catch (error) {
     console.error('Middleware error:', error, {
       pathname: request.nextUrl?.pathname,
       url: request.url,
+      errorMessage: error?.message,
+      errorStack: error?.stack,
     })
     // Return a basic response to prevent 500 error
     return NextResponse.next()
