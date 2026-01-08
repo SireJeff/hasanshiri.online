@@ -151,15 +151,15 @@ export async function middleware(request) {
       }
     }
 
-    // Create base response
-    const response = NextResponse.next()
+    // Create base response and return directly
+    // TODO: Re-enable Supabase after fixing Edge Runtime compatibility
+    return NextResponse.next()
 
     // Handle Supabase session for all routes (only if env vars are configured)
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return await handleSupabaseSession(request, response)
-    }
-
-    return response
+    // Temporarily disabled to isolate middleware error
+    // if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    //   return await handleSupabaseSession(request, response)
+    // }
   } catch (error) {
     console.error('Middleware error:', error, {
       pathname: request.nextUrl?.pathname,
