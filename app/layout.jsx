@@ -3,9 +3,6 @@ import { Providers } from './providers'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
-// System font class
-const fontClass = 'font-sans'
-
 // Root metadata - will be overridden by locale layouts
 export const metadata = {
   metadataBase: new URL('https://hasanshiri.online'),
@@ -21,10 +18,25 @@ export const metadata = {
   },
 }
 
+// Viewport settings for mobile
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+  ],
+}
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={fontClass}>
+      <head>
+        {/* DNS prefetch for Supabase */}
+        <link rel="dns-prefetch" href="https://supabase.co" />
+      </head>
+      <body className="font-sans antialiased">
         <Providers>
           <div className="min-h-screen bg-background text-foreground relative">
             {children}
