@@ -1,40 +1,74 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getArticleBySlug, getRelatedArticles, recordArticleView } from '@/lib/actions/articles'
+import { getArticleBySlug, getRelatedArticles, recordArticleView, getAllArticleSlugs } from '@/lib/actions/articles'
 import { ArticleContent } from '@/components/blog/ArticleContent'
 import { TableOfContentsCompact } from '@/components/blog/TableOfContents'
 import { ShareButtons, ShareButtonsVertical } from '@/components/blog/ShareButtons'
 import { RelatedArticles } from '@/components/blog/RelatedArticles'
 import { CommentSection } from '@/components/comments/CommentSection'
+import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
+import { ArticleJsonLd } from '@/components/seo/JsonLd'
 import { ArrowLeft, Calendar, Clock, Eye, User } from 'lucide-react'
 import { headers } from 'next/headers'
+import { i18nConfig, generateAlternateUrls } from '@/lib/i18n-config'
+
+// Generate static params for all articles in all locales
+export async function generateStaticParams() {
+  const slugs = await getAllArticleSlugs()
+  const params = []
+
+  for (const locale of i18nConfig.locales) {
+    for (const slug of slugs) {
+      params.push({ locale, slug })
+    }
+  }
+
+  return params
+}
 
 // Generate metadata
 export async function generateMetadata({ params }) {
-  const { article } = await getArticleBySlug(params.slug)
+  const { locale, slug } = await params
+  const { article } = await getArticleBySlug(slug)
 
   if (!article) {
     return { title: 'Article Not Found' }
   }
 
-  const title = article.meta_title_en || article.title_en
-  const description = article.meta_description_en || article.excerpt_en || ''
+  const isRtl = locale === 'fa'
+  const baseUrl = 'https://hasanshiri.online'
+  const alternates = generateAlternateUrls(`/blog/${slug}`, baseUrl)
+
+  const title = isRtl
+    ? (article.meta_title_fa || article.title_fa || article.title_en)
+    : (article.meta_title_en || article.title_en)
+  const description = isRtl
+    ? (article.meta_description_fa || article.excerpt_fa || article.excerpt_en || '')
+    : (article.meta_description_en || article.excerpt_en || '')
 
   return {
-    title: `${title} | Hasan Shiri`,
+    title,
     description,
+    alternates: {
+      canonical: `${baseUrl}/${locale}/blog/${slug}`,
+      languages: alternates.languages,
+    },
     openGraph: {
       title,
       description,
       type: 'article',
       publishedTime: article.published_at,
+      modifiedTime: article.updated_at,
       authors: [article.author?.full_name || 'Hasan Shiri'],
+      locale: isRtl ? 'fa_IR' : 'en_US',
+      url: `${baseUrl}/${locale}/blog/${slug}`,
       images: article.og_image || article.featured_image ? [
         {
           url: article.og_image || article.featured_image,
           width: 1200,
           height: 630,
+          alt: title,
         },
       ] : [],
     },
@@ -48,7 +82,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ArticlePage({ params }) {
-  const { article, error } = await getArticleBySlug(params.slug)
+  const { locale, slug } = await params
+  const { article, error } = await getArticleBySlug(slug)
 
   if (error || !article) {
     notFound()
@@ -74,13 +109,12 @@ export default async function ArticlePage({ params }) {
     3
   )
 
-  const locale = 'en' // TODO: Get from i18n
   const isRtl = locale === 'fa'
-  const title = isRtl ? article.title_fa : article.title_en
-  const content = isRtl ? article.content_fa : article.content_en
-  const excerpt = isRtl ? article.excerpt_fa : article.excerpt_en
+  const title = isRtl ? (article.title_fa || article.title_en) : article.title_en
+  const content = isRtl ? (article.content_fa || article.content_en) : article.content_en
+  const excerpt = isRtl ? (article.excerpt_fa || article.excerpt_en) : article.excerpt_en
   const categoryName = article.category
-    ? (isRtl ? article.category.name_fa : article.category.name_en)
+    ? (isRtl ? (article.category.name_fa || article.category.name_en) : article.category.name_en)
     : null
 
   const formattedDate = article.published_at
@@ -90,10 +124,28 @@ export default async function ArticlePage({ params }) {
       )
     : null
 
-  const articleUrl = `https://hasanshiri.online/blog/${article.slug}`
+  const articleUrl = `https://hasanshiri.online/${locale}/blog/${article.slug}`
+
+  // Breadcrumb items
+  const breadcrumbItems = [
+    { label: isRtl ? 'خانه' : 'Home', href: `/${locale}` },
+    { label: isRtl ? 'بلاگ' : 'Blog', href: `/${locale}/blog` },
+    ...(article.category ? [{
+      label: categoryName,
+      href: `/${locale}/blog?category=${article.category.slug}`,
+    }] : []),
+    { label: title },
+  ]
 
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD Structured Data */}
+      <ArticleJsonLd
+        article={article}
+        locale={locale}
+        url={articleUrl}
+      />
+
       {/* Header / Hero */}
       <header className="relative">
         {/* Featured Image */}
@@ -113,19 +165,22 @@ export default async function ArticlePage({ params }) {
         {/* Title area */}
         <div className="container relative">
           <div className={`max-w-3xl mx-auto ${article.featured_image ? '-mt-32 relative z-10' : 'pt-12'}`}>
+            {/* Breadcrumbs */}
+            <Breadcrumbs items={breadcrumbItems} locale={locale} />
+
             {/* Back link */}
             <Link
-              href="/blog"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+              href={`/${locale}/blog`}
+              className={`inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
             >
-              <ArrowLeft className="w-4 h-4" />
-              Back to blog
+              <ArrowLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
+              {isRtl ? 'بازگشت به بلاگ' : 'Back to blog'}
             </Link>
 
             {/* Category */}
             {article.category && (
               <Link
-                href={`/blog?category=${article.category.slug}`}
+                href={`/${locale}/blog?category=${article.category.slug}`}
                 className="inline-block px-3 py-1 text-sm font-medium rounded-full text-white mb-4"
                 style={{ backgroundColor: article.category.color || '#3b82f6' }}
               >
@@ -152,10 +207,10 @@ export default async function ArticlePage({ params }) {
             )}
 
             {/* Meta */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-8">
+            <div className={`flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-8 ${isRtl ? 'flex-row-reverse' : ''}`}>
               {/* Author */}
               {article.author && (
-                <div className="flex items-center gap-2">
+                <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
                   {article.author.avatar_url ? (
                     <Image
                       src={article.author.avatar_url}
@@ -179,7 +234,7 @@ export default async function ArticlePage({ params }) {
 
               {/* Date */}
               {formattedDate && (
-                <span className="flex items-center gap-1.5">
+                <span className={`flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                   <Calendar className="w-4 h-4" />
                   {formattedDate}
                 </span>
@@ -188,18 +243,22 @@ export default async function ArticlePage({ params }) {
               <span className="text-border">•</span>
 
               {/* Reading time */}
-              <span className="flex items-center gap-1.5">
+              <span className={`flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <Clock className="w-4 h-4" />
-                {article.reading_time_minutes} min read
+                {isRtl
+                  ? `${article.reading_time_minutes} دقیقه مطالعه`
+                  : `${article.reading_time_minutes} min read`}
               </span>
 
               {/* Views */}
               {article.view_count > 0 && (
                 <>
                   <span className="text-border">•</span>
-                  <span className="flex items-center gap-1.5">
+                  <span className={`flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                     <Eye className="w-4 h-4" />
-                    {article.view_count.toLocaleString()} views
+                    {isRtl
+                      ? `${article.view_count.toLocaleString('fa-IR')} بازدید`
+                      : `${article.view_count.toLocaleString()} views`}
                   </span>
                 </>
               )}
@@ -207,14 +266,14 @@ export default async function ArticlePage({ params }) {
 
             {/* Tags */}
             {article.tags && article.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-8">
+              <div className={`flex flex-wrap gap-2 mb-8 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 {article.tags.map(tag => (
                   <Link
                     key={tag.id}
-                    href={`/blog?tag=${tag.slug}`}
+                    href={`/${locale}/blog?tag=${tag.slug}`}
                     className="text-sm px-3 py-1 bg-secondary text-secondary-foreground rounded-full hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
-                    #{isRtl ? tag.name_fa : tag.name_en}
+                    #{isRtl ? (tag.name_fa || tag.name_en) : tag.name_en}
                   </Link>
                 ))}
               </div>
@@ -228,7 +287,22 @@ export default async function ArticlePage({ params }) {
 
       {/* Main Content */}
       <main className="container py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,200px] gap-12 max-w-5xl mx-auto">
+        <div className={`grid grid-cols-1 lg:grid-cols-[1fr,200px] gap-12 max-w-5xl mx-auto ${isRtl ? 'lg:grid-cols-[200px,1fr]' : ''}`}>
+          {/* Sidebar - TOC & Share (Left for RTL) */}
+          {isRtl && (
+            <aside className="hidden lg:block order-first">
+              <div className="sticky top-24 space-y-8">
+                <TableOfContentsCompact content={content} locale={locale} />
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    {isRtl ? 'اشتراک‌گذاری' : 'Share'}
+                  </h4>
+                  <ShareButtonsVertical title={title} url={articleUrl} locale={locale} />
+                </div>
+              </div>
+            </aside>
+          )}
+
           {/* Article Content */}
           <article className="min-w-0">
             <ArticleContent content={content} locale={locale} />
@@ -241,7 +315,7 @@ export default async function ArticlePage({ params }) {
             {/* Author Bio */}
             {article.author?.bio && (
               <div className="mt-8 p-6 bg-card border border-border rounded-xl">
-                <div className="flex items-start gap-4">
+                <div className={`flex items-start gap-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
                   {article.author.avatar_url ? (
                     <Image
                       src={article.author.avatar_url}
@@ -255,7 +329,7 @@ export default async function ArticlePage({ params }) {
                       <User className="w-8 h-8 text-primary" />
                     </div>
                   )}
-                  <div>
+                  <div className={isRtl ? 'text-right' : ''}>
                     <h3 className="font-semibold text-foreground mb-1">
                       {article.author.full_name || 'Anonymous'}
                     </h3>
@@ -274,21 +348,20 @@ export default async function ArticlePage({ params }) {
             <CommentSection articleId={article.id} locale={locale} />
           </article>
 
-          {/* Sidebar - TOC & Share */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 space-y-8">
-              {/* Table of Contents */}
-              <TableOfContentsCompact content={content} locale={locale} />
-
-              {/* Share Buttons Vertical */}
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  Share
-                </h4>
-                <ShareButtonsVertical title={title} url={articleUrl} locale={locale} />
+          {/* Sidebar - TOC & Share (Right for LTR) */}
+          {!isRtl && (
+            <aside className="hidden lg:block">
+              <div className="sticky top-24 space-y-8">
+                <TableOfContentsCompact content={content} locale={locale} />
+                <div>
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                    Share
+                  </h4>
+                  <ShareButtonsVertical title={title} url={articleUrl} locale={locale} />
+                </div>
               </div>
-            </div>
-          </aside>
+            </aside>
+          )}
         </div>
       </main>
     </div>

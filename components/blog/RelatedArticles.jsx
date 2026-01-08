@@ -15,13 +15,16 @@ export function RelatedArticles({ articles, locale = 'en' }) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {articles.map(article => {
-          const title = isRtl ? article.title_fa : article.title_en
-          const excerpt = isRtl ? article.excerpt_fa : article.excerpt_en
+          const title = isRtl ? (article.title_fa || article.title_en) : article.title_en
+          const excerpt = isRtl ? (article.excerpt_fa || article.excerpt_en) : article.excerpt_en
+          const categoryName = article.category
+            ? (isRtl ? (article.category.name_fa || article.category.name_en) : article.category.name_en)
+            : null
 
           return (
             <Link
               key={article.id}
-              href={`/blog/${article.slug}`}
+              href={`/${locale}/blog/${article.slug}`}
               className="group block bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-colors"
             >
               {/* Image */}
@@ -38,10 +41,10 @@ export function RelatedArticles({ articles, locale = 'en' }) {
                 )}
                 {article.category && (
                   <span
-                    className="absolute top-2 left-2 px-2 py-0.5 text-xs font-medium rounded text-white"
+                    className={`absolute top-2 ${isRtl ? 'right-2' : 'left-2'} px-2 py-0.5 text-xs font-medium rounded text-white`}
                     style={{ backgroundColor: article.category.color || '#3b82f6' }}
                   >
-                    {isRtl ? article.category.name_fa : article.category.name_en}
+                    {categoryName}
                   </span>
                 )}
               </div>
@@ -56,7 +59,7 @@ export function RelatedArticles({ articles, locale = 'en' }) {
                     {excerpt}
                   </p>
                 )}
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <div className={`flex items-center gap-1 text-xs text-muted-foreground ${isRtl ? 'flex-row-reverse' : ''}`}>
                   <Clock className="w-3 h-3" />
                   {article.reading_time_minutes} {isRtl ? 'دقیقه' : 'min read'}
                 </div>

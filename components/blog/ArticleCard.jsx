@@ -6,10 +6,10 @@ import { Calendar, Clock, Eye, ArrowRight } from 'lucide-react'
 
 export function ArticleCard({ article, locale = 'en' }) {
   const isRtl = locale === 'fa'
-  const title = isRtl ? article.title_fa : article.title_en
-  const excerpt = isRtl ? article.excerpt_fa : article.excerpt_en
+  const title = isRtl ? (article.title_fa || article.title_en) : article.title_en
+  const excerpt = isRtl ? (article.excerpt_fa || article.excerpt_en) : article.excerpt_en
   const categoryName = article.category
-    ? (isRtl ? article.category.name_fa : article.category.name_en)
+    ? (isRtl ? (article.category.name_fa || article.category.name_en) : article.category.name_en)
     : null
 
   const formattedDate = article.published_at
@@ -19,13 +19,17 @@ export function ArticleCard({ article, locale = 'en' }) {
       )
     : null
 
+  // Locale-aware URLs
+  const articleUrl = `/${locale}/blog/${article.slug}`
+  const tagUrl = (tagSlug) => `/${locale}/blog?tag=${tagSlug}`
+
   return (
     <article
       className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
       dir={isRtl ? 'rtl' : 'ltr'}
     >
       {/* Featured Image */}
-      <Link href={`/blog/${article.slug}`} className="block relative aspect-video overflow-hidden">
+      <Link href={articleUrl} className="block relative aspect-video overflow-hidden">
         {article.featured_image ? (
           <Image
             src={article.featured_image}
@@ -50,7 +54,7 @@ export function ArticleCard({ article, locale = 'en' }) {
         {/* Featured Badge */}
         {article.is_featured && (
           <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-500 text-white">
-            ⭐ Featured
+            {isRtl ? '⭐ ویژه' : '⭐ Featured'}
           </span>
         )}
       </Link>
@@ -58,28 +62,28 @@ export function ArticleCard({ article, locale = 'en' }) {
       {/* Content */}
       <div className="p-5">
         {/* Meta */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
+        <div className={`flex items-center gap-4 text-xs text-muted-foreground mb-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
           {formattedDate && (
-            <span className="flex items-center gap-1">
+            <span className={`flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
               <Calendar className="w-3.5 h-3.5" />
               {formattedDate}
             </span>
           )}
-          <span className="flex items-center gap-1">
+          <span className={`flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
             <Clock className="w-3.5 h-3.5" />
             {article.reading_time_minutes} {isRtl ? 'دقیقه' : 'min read'}
           </span>
           {article.view_count > 0 && (
-            <span className="flex items-center gap-1">
+            <span className={`flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}>
               <Eye className="w-3.5 h-3.5" />
-              {article.view_count.toLocaleString()}
+              {article.view_count.toLocaleString(isRtl ? 'fa-IR' : 'en-US')}
             </span>
           )}
         </div>
 
         {/* Title */}
         <h2 className="text-lg font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-          <Link href={`/blog/${article.slug}`}>{title}</Link>
+          <Link href={articleUrl}>{title}</Link>
         </h2>
 
         {/* Excerpt */}
@@ -91,14 +95,14 @@ export function ArticleCard({ article, locale = 'en' }) {
 
         {/* Tags */}
         {article.tags && article.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
+          <div className={`flex flex-wrap gap-1.5 mb-4 ${isRtl ? 'flex-row-reverse' : ''}`}>
             {article.tags.slice(0, 3).map(tag => (
               <Link
                 key={tag.id}
-                href={`/blog?tag=${tag.slug}`}
+                href={tagUrl(tag.slug)}
                 className="text-xs px-2 py-0.5 bg-secondary text-secondary-foreground rounded hover:bg-primary hover:text-primary-foreground transition-colors"
               >
-                #{isRtl ? tag.name_fa : tag.name_en}
+                #{isRtl ? (tag.name_fa || tag.name_en) : tag.name_en}
               </Link>
             ))}
             {article.tags.length > 3 && (
@@ -111,8 +115,8 @@ export function ArticleCard({ article, locale = 'en' }) {
 
         {/* Read More */}
         <Link
-          href={`/blog/${article.slug}`}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+          href={articleUrl}
+          className={`inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline ${isRtl ? 'flex-row-reverse' : ''}`}
         >
           {isRtl ? 'ادامه مطلب' : 'Read more'}
           <ArrowRight className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
