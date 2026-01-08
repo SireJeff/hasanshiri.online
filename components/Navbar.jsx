@@ -4,21 +4,28 @@ import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { LanguageToggle } from "./LanguageToggle";
 import { ThemeToggle } from "./ThemeToggle";
 import { ThemeColorToggle } from "./ThemeColorToggle";
 
-export const Navbar = () => {
+export const Navbar = ({ locale = 'en' }) => {
   const { t } = useTranslation();
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Determine if we're on the homepage
+  const isHomePage = pathname === `/${locale}` || pathname === '/';
+
   const navItems = [
-    { name: t("nav.home"), href: "#hero" },
-    { name: t("nav.about"), href: "#about" },
-    { name: t("nav.skills"), href: "#skills" },
-    { name: t("nav.projects"), href: "#projects" },
-    { name: t("nav.contact"), href: "#contact" },
+    { name: t("nav.home"), href: isHomePage ? "#hero" : `/${locale}`, isExternal: !isHomePage },
+    { name: t("nav.about"), href: isHomePage ? "#about" : `/${locale}#about`, isExternal: !isHomePage },
+    { name: t("nav.skills"), href: isHomePage ? "#skills" : `/${locale}#skills`, isExternal: !isHomePage },
+    { name: t("nav.projects"), href: isHomePage ? "#projects" : `/${locale}#projects`, isExternal: !isHomePage },
+    { name: t("nav.blog"), href: `/${locale}/blog`, isExternal: true },
+    { name: t("nav.contact"), href: isHomePage ? "#contact" : `/${locale}#contact`, isExternal: !isHomePage },
   ];
 
   useEffect(() => {
@@ -51,13 +58,23 @@ export const Navbar = () => {
         <div className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
           <div className="flex space-x-8 rtl:space-x-reverse">
             {navItems.map((item, key) => (
-              <a
-                key={key}
-                href={item.href}
-                className="text-foreground/80 hover:text-primary transition-colors duration-300"
-              >
-                {item.name}
-              </a>
+              item.isExternal ? (
+                <Link
+                  key={key}
+                  href={item.href}
+                  className="text-foreground/80 hover:text-primary transition-colors duration-300"
+                >
+                  {item.name}
+                </Link>
+              ) : (
+                <a
+                  key={key}
+                  href={item.href}
+                  className="text-foreground/80 hover:text-primary transition-colors duration-300"
+                >
+                  {item.name}
+                </a>
+              )
             ))}
           </div>
           <div className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -91,14 +108,25 @@ export const Navbar = () => {
         >
           <div className="flex flex-col space-y-8 text-xl">
             {navItems.map((item, key) => (
-              <a
-                key={key}
-                href={item.href}
-                className="text-foreground/80 hover:text-primary transition-colors duration-300"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </a>
+              item.isExternal ? (
+                <Link
+                  key={key}
+                  href={item.href}
+                  className="text-foreground/80 hover:text-primary transition-colors duration-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ) : (
+                <a
+                  key={key}
+                  href={item.href}
+                  className="text-foreground/80 hover:text-primary transition-colors duration-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.name}
+                </a>
+              )
             ))}
           </div>
         </div>
