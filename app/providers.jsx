@@ -1,9 +1,11 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { I18nextProvider } from 'react-i18next'
 import i18n from '@/lib/i18n'
 import { Toaster } from '@/components/ui/toaster'
+import { ChatWidget } from '@/components/chat'
 
 // Theme colors configuration
 const themeColors = [
@@ -84,6 +86,18 @@ function ThemeProvider({ children }) {
   )
 }
 
+// Chat Widget Wrapper (only show on non-admin pages)
+function ChatWidgetWrapper() {
+  const pathname = usePathname()
+
+  // Don't show chat widget on admin pages or auth pages
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/auth')) {
+    return null
+  }
+
+  return <ChatWidget />
+}
+
 // Combined Providers
 export function Providers({ children }) {
   return (
@@ -91,6 +105,7 @@ export function Providers({ children }) {
       <ThemeProvider>
         {children}
         <Toaster />
+        <ChatWidgetWrapper />
       </ThemeProvider>
     </I18nextProvider>
   )
