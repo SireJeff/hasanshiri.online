@@ -1,39 +1,48 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
-import { i18nConfig } from './lib/i18n-config'
+
+// i18n config inline to avoid import issues in edge runtime
+const i18nConfig = {
+  defaultLocale: 'en',
+  locales: ['en', 'fa'],
+}
 
 // Get preferred locale from request
 function getPreferredLocale(request) {
-  // Check cookie first
-  const localeCookie = request.cookies.get('NEXT_LOCALE')?.value
-  if (localeCookie && i18nConfig.locales.includes(localeCookie)) {
-    return localeCookie
-  }
+  try {
+    // Check cookie first
+    const localeCookie = request.cookies.get('NEXT_LOCALE')?.value
+    if (localeCookie && i18nConfig.locales.includes(localeCookie)) {
+      return localeCookie
+    }
 
-  // Check Accept-Language header
-  const acceptLanguage = request.headers.get('Accept-Language')
-  if (acceptLanguage) {
-    const languages = acceptLanguage.split(',').map((lang) => {
-      const [code, priority] = lang.trim().split(';q=')
-      return {
-        code: code.split('-')[0].toLowerCase(),
-        priority: priority ? parseFloat(priority) : 1,
-      }
-    })
+    // Check Accept-Language header
+    const acceptLanguage = request.headers.get('Accept-Language')
+    if (acceptLanguage) {
+      const languages = acceptLanguage.split(',').map((lang) => {
+        const [code, priority] = lang.trim().split(';q=')
+        return {
+          code: code.split('-')[0].toLowerCase(),
+          priority: priority ? parseFloat(priority) : 1,
+        }
+      })
 
-    // Sort by priority
-    languages.sort((a, b) => b.priority - a.priority)
+      // Sort by priority
+      languages.sort((a, b) => b.priority - a.priority)
 
-    // Find first matching locale
-    for (const lang of languages) {
-      if (i18nConfig.locales.includes(lang.code)) {
-        return lang.code
-      }
-      // Check for Persian variations
-      if (lang.code === 'fa' || lang.code === 'per' || lang.code === 'fas') {
-        return 'fa'
+      // Find first matching locale
+      for (const lang of languages) {
+        if (i18nConfig.locales.includes(lang.code)) {
+          return lang.code
+        }
+        // Check for Persian variations
+        if (lang.code === 'fa' || lang.code === 'per' || lang.code === 'fas') {
+          return 'fa'
+        }
       }
     }
+  } catch (e) {
+    console.error('Error getting preferred locale:', e)
   }
 
   return i18nConfig.defaultLocale
@@ -46,6 +55,7 @@ function shouldSkipLocale(pathname) {
     pathname.startsWith('/api') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/auth') ||
+    pathname.startsWith('/monitoring') ||
     pathname.includes('.') ||
     pathname === '/favicon.ico' ||
     pathname === '/robots.txt' ||
@@ -57,7 +67,6 @@ function shouldSkipLocale(pathname) {
 async function handleSupabaseSession(request, response) {
   // Skip if Supabase env vars are not configured
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    console.warn('Supabase environment variables not configured')
     return response
   }
 
@@ -94,13 +103,6 @@ async function handleSupabaseSession(request, response) {
         url.searchParams.set('redirectTo', request.nextUrl.pathname)
         return NextResponse.redirect(url)
       }
-
-      const adminEmails = process.env.ADMIN_EMAILS?.split(',') || []
-      if (adminEmails.length > 0 && !adminEmails.includes(user.email)) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/'
-        return NextResponse.redirect(url)
-      }
     }
 
     return response
@@ -111,39 +113,45 @@ async function handleSupabaseSession(request, response) {
 }
 
 export async function middleware(request) {
-  const { pathname } = request.nextUrl
+  try {
+    const { pathname } = request.nextUrl
 
-  // Handle locale routing for public pages
-  if (!shouldSkipLocale(pathname)) {
-    // Check if pathname has a valid locale prefix
-    const pathnameHasLocale = i18nConfig.locales.some(
-      (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-    )
+    // Handle locale routing for public pages
+    if (!shouldSkipLocale(pathname)) {
+      // Check if pathname has a valid locale prefix
+      const pathnameHasLocale = i18nConfig.locales.some(
+        (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+      )
 
-    if (!pathnameHasLocale) {
-      // No locale in pathname, redirect to preferred locale
-      const preferredLocale = getPreferredLocale(request)
-      const newUrl = new URL(`/${preferredLocale}${pathname}`, request.url)
-      newUrl.search = request.nextUrl.search
+      if (!pathnameHasLocale) {
+        // No locale in pathname, redirect to preferred locale
+        const preferredLocale = getPreferredLocale(request)
+        const newUrl = new URL(`/${preferredLocale}${pathname}`, request.url)
+        newUrl.search = request.nextUrl.search
 
-      const response = NextResponse.redirect(newUrl)
-      response.cookies.set('NEXT_LOCALE', preferredLocale, {
-        maxAge: 60 * 60 * 24 * 365,
-        path: '/',
-        sameSite: 'lax',
-      })
+        const response = NextResponse.redirect(newUrl)
+        response.cookies.set('NEXT_LOCALE', preferredLocale, {
+          maxAge: 60 * 60 * 24 * 365,
+          path: '/',
+          sameSite: 'lax',
+        })
 
-      return response
+        return response
+      }
     }
+
+    // Create base response
+    let response = NextResponse.next({ request })
+
+    // Handle Supabase session for all routes
+    response = await handleSupabaseSession(request, response)
+
+    return response
+  } catch (error) {
+    console.error('Middleware error:', error)
+    // Return a basic response to prevent 500 error
+    return NextResponse.next()
   }
-
-  // Create base response
-  let response = NextResponse.next({ request })
-
-  // Handle Supabase session for all routes
-  response = await handleSupabaseSession(request, response)
-
-  return response
 }
 
 export const config = {
