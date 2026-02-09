@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server'
 
-// Lazy import Supabase only when needed to avoid Edge Runtime issues
-// @supabase/ssr uses __dirname which doesn't exist in ES modules
-let createServerClient = null
-async function getSupabaseClient() {
-  if (!createServerClient) {
-    const module = await import('@supabase/ssr')
-    createServerClient = module.createServerClient
-  }
-  return createServerClient
-}
+// Note: Supabase middleware is currently disabled
+// The @supabase/ssr package has compatibility issues with Edge Runtime
+// Re-enable after finding an Edge-compatible solution
 
 // i18n config inline to avoid import issues in edge runtime
 const i18nConfig = {
@@ -77,60 +70,11 @@ function shouldSkipLocale(pathname) {
   )
 }
 
-// Handle Supabase session update
+// Note: Supabase session handling is disabled due to Edge Runtime compatibility issues
+// TODO: Implement Edge-compatible authentication or move auth logic to API routes
 async function handleSupabaseSession(request, response) {
-  // Skip if Supabase env vars are not configured
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return response
-  }
-
-  try {
-    // Lazy import to avoid Edge Runtime issues
-    const _createServerClient = await getSupabaseClient()
-
-    // Trim whitespace and remove any newlines from env vars
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL.trim().replace(/[\r\n]/g, '')
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.trim().replace(/[\r\n]/g, '')
-
-    const supabase = _createServerClient(
-      url,
-      key,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value)
-            )
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            )
-          },
-        },
-      }
-    )
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    // Protect admin routes
-    if (request.nextUrl.pathname.startsWith('/admin')) {
-      if (!user) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/auth/login'
-        url.searchParams.set('redirectTo', request.nextUrl.pathname)
-        return NextResponse.redirect(url)
-      }
-    }
-
-    return response
-  } catch (error) {
-    console.error('Middleware Supabase error:', error)
-    return response
-  }
+  // Currently disabled - this would require @supabase/ssr which has Edge Runtime issues
+  return response
 }
 
 export async function middleware(request) {
