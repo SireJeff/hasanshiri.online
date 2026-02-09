@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { i18nConfig, getLocaleDirection, generateAlternateUrls } from '@/lib/i18n-config'
+import { DirAttribute } from '@/components/DirAttribute'
 
 // Generate static params for all locales
 export function generateStaticParams() {
@@ -96,8 +97,12 @@ export default async function LocaleLayout({ children, params }) {
   const direction = getLocaleDirection(locale)
 
   return (
-    <div lang={locale} dir={direction}>
-      {children}
-    </div>
+    <>
+      {/* Set dir attribute on html element for E2E tests and proper RTL support */}
+      <DirAttribute locale={locale} direction={direction} />
+      <div lang={locale} dir={direction}>
+        {children}
+      </div>
+    </>
   )
 }

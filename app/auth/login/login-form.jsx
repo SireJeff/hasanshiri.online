@@ -130,6 +130,7 @@ export function LoginForm() {
         <button
           onClick={handleGithubLogin}
           disabled={loading}
+          aria-label="Login with GitHub"
           className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg hover:bg-secondary transition-colors disabled:opacity-50"
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
