@@ -1,5 +1,15 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
+
+// Lazy import Supabase only when needed to avoid Edge Runtime issues
+// @supabase/ssr uses __dirname which doesn't exist in ES modules
+let createServerClient = null
+async function getSupabaseClient() {
+  if (!createServerClient) {
+    const module = await import('@supabase/ssr')
+    createServerClient = module.createServerClient
+  }
+  return createServerClient
+}
 
 // i18n config inline to avoid import issues in edge runtime
 const i18nConfig = {
@@ -75,9 +85,16 @@ async function handleSupabaseSession(request, response) {
   }
 
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    // Lazy import to avoid Edge Runtime issues
+    const _createServerClient = await getSupabaseClient()
+
+    // Trim whitespace and remove any newlines from env vars
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL.trim().replace(/[\r\n]/g, '')
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.trim().replace(/[\r\n]/g, '')
+
+    const supabase = _createServerClient(
+      url,
+      key,
       {
         cookies: {
           getAll() {
