@@ -183,7 +183,7 @@ export const ProjectsSection = () => {
             <a
               className="cosmic-button w-fit flex items-center gap-2"
               target="_blank"
-              href="https://www.youtube.com/@Chadminus/videos?app=desktop"
+              href="https://www.youtube.com/@sire_jeff"
             >
               <Youtube size={16} />
               {t("projects.watchVideos")} <ArrowRight size={16} />

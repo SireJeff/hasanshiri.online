@@ -102,10 +102,10 @@ export const ContactSection = () => {
                 <div>
                   <h4 className="font-medium">{t("contact.phone")}</h4>
                   <a
-                    href="tel:+989130876341"
+                    href="tel:+989209954805"
                     className="text-muted-foreground hover:text-primary transition-colors"
                   >
-                    +98 913 087 6341
+                    +98 920 995 4805
                   </a>
                 </div>
               </div>
@@ -125,22 +125,22 @@ export const ContactSection = () => {
             <div className="pt-8">
               <h4 className="font-medium mb-4">{t("contact.connectWithMe")}</h4>
               <div className="flex space-x-4 justify-center">
-                <a href="https://www.linkedin.com/in/mohammad-hasan-shiri-35b21119a" target="_blank">
+                <a href="https://www.linkedin.com/in/mohammadhasanshiri" target="_blank">
                   <Linkedin />
                 </a>
-                <a href="https://x.com/jeffthedeafreff" target="_blank">
+                <a href="https://x.com/MHasanshiri" target="_blank">
                   <Twitter />
                 </a>
                 <a href="https://www.instagram.com/mhasanshiri/" target="_blank">
                   <Instagram />
                 </a>
-                <a href="https://t.me/sire_jeff" target="_blank">
+                <a href="https://t.me/@Mhasanshiri" target="_blank">
                   <TelegramIcon />
                 </a>
                 <a href="https://wa.me/989209954805" target="_blank">
                   <WhatsappIcon />
                 </a>
-                <a href="https://www.youtube.com/@Chadminus/videos?app=desktop" target="_blank">
+                <a href="https://www.youtube.com/@sire_jeff" target="_blank">
                   <Youtube className="text-foreground hover:text-primary transition-colors" />
                 </a>
               </div>

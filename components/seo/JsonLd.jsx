@@ -100,7 +100,10 @@ export function PersonJsonLd({ locale = 'en' }) {
     ],
     sameAs: [
       'https://github.com/SireJeff',
-      'https://linkedin.com/in/hasanshiri',
+      'https://linkedin.com/in/mohammadhasanshiri',
+      'https://x.com/MHasanshiri',
+      'https://youtube.com/@sire_jeff',
+      'https://t.me/@Mhasanshiri',
     ],
   }
 
@@ -117,7 +120,10 @@ export function OrganizationJsonLd() {
     logo: 'https://hasanshiri.online/logo.png',
     sameAs: [
       'https://github.com/SireJeff',
-      'https://linkedin.com/in/hasanshiri',
+      'https://linkedin.com/in/mohammadhasanshiri',
+      'https://x.com/MHasanshiri',
+      'https://youtube.com/@sire_jeff',
+      'https://t.me/@Mhasanshiri',
     ],
   }
 
