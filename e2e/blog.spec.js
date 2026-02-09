@@ -39,6 +39,10 @@ test.describe('Blog', () => {
 
     await expect(page).toHaveURL(/\/fa\/blog/)
 
+    // Wait for client-side hydration
+    await page.waitForLoadState('domcontentloaded')
+    await page.waitForTimeout(1000) // Allow time for DirAttribute component to set dir
+
     // Check RTL direction
     const html = page.locator('html')
     await expect(html).toHaveAttribute('dir', 'rtl')

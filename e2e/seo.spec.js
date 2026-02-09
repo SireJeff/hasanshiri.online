@@ -85,7 +85,11 @@ test.describe('SEO', () => {
   test('heading hierarchy is correct', async ({ page }) => {
     await page.goto('/en')
 
-    // Check that there's exactly one H1
+    // Wait for client-side hydration and animations
+    await page.waitForLoadState('domcontentloaded')
+    await page.waitForTimeout(1500) // Allow time for HeroSection to render with animations
+
+    // Check that there's at least one H1
     const h1Count = await page.locator('h1').count()
     expect(h1Count).toBeGreaterThanOrEqual(1)
 

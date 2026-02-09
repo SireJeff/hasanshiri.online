@@ -28,6 +28,10 @@ test.describe('Admin', () => {
   test('login form has required fields', async ({ page }) => {
     await page.goto('/auth/login')
 
+    // Wait for client-side hydration
+    await page.waitForLoadState('domcontentloaded')
+    await page.waitForTimeout(500)
+
     // Check for email/password fields or OAuth buttons
     const emailField = page.getByLabel(/email/i)
       .or(page.getByPlaceholder(/email/i))

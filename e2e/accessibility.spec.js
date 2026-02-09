@@ -193,7 +193,12 @@ test.describe('Accessibility', () => {
   test('Persian page has proper RTL support', async ({ page }) => {
     await page.goto('/fa')
 
+    // Wait for page to be fully loaded and client-side hydration to complete
+    await page.waitForLoadState('domcontentloaded')
+    await page.waitForTimeout(1000) // Allow time for DirAttribute component to set dir
+
     // Check HTML dir attribute
+    await page.waitForSelector('html[dir]', { timeout: 5000 })
     const htmlDir = await page.locator('html').getAttribute('dir')
     expect(htmlDir).toBe('rtl')
 

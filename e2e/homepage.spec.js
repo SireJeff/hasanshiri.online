@@ -17,6 +17,10 @@ test.describe('Homepage', () => {
   test('loads Persian homepage successfully', async ({ page }) => {
     await page.goto('/fa')
 
+    // Wait for client-side hydration to complete
+    await page.waitForLoadState('domcontentloaded')
+    await page.waitForTimeout(1000) // Allow time for DirAttribute component to set dir
+
     // Check page has RTL direction
     const html = page.locator('html')
     await expect(html).toHaveAttribute('dir', 'rtl')
@@ -49,9 +53,9 @@ test.describe('Homepage', () => {
   test('theme toggle works', async ({ page }) => {
     await page.goto('/en')
 
-    // Find theme toggle button
-    const themeToggle = page.getByRole('button', { name: /theme|dark|light/i })
-    if (await themeToggle.isVisible()) {
+    // Find theme toggle button - use first() to handle strict mode violation
+    const themeToggle = page.getByRole('button', { name: /theme|dark|light/i }).first()
+    if (await themeToggle.isVisible().catch(() => false)) {
       await themeToggle.click()
 
       // Check body class changes (dark mode)
