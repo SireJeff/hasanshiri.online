@@ -28,7 +28,16 @@ jest.mock('next/image', () => ({
   default: function MockImage(props) {
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     const React = require('react')
-    return React.createElement('img', props)
+    // Filter out Next.js Image props that aren't valid on native img elements
+    const {
+      fill,
+      priority,
+      quality,
+      placeholder,
+      blurDataURL,
+      ...imgProps
+    } = props
+    return React.createElement('img', imgProps)
   },
 }))
 
@@ -74,7 +83,9 @@ beforeAll(() => {
   console.error = (...args) => {
     if (
       typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is no longer supported')
+      (args[0].includes('Warning: ReactDOM.render is no longer supported') ||
+       args[0].includes('Warning: Received') ||
+       args[0].includes('non-boolean attribute'))
     ) {
       return
     }
