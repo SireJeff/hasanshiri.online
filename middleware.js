@@ -1,8 +1,5 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
-
-// Note: Supabase middleware is currently disabled
-// The @supabase/ssr package has compatibility issues with Edge Runtime
-// Re-enable after finding an Edge-compatible solution
 
 // i18n config inline to avoid import issues in edge runtime
 const i18nConfig = {
@@ -70,11 +67,57 @@ function shouldSkipLocale(pathname) {
   )
 }
 
-// Note: Supabase session handling is disabled due to Edge Runtime compatibility issues
-// TODO: Implement Edge-compatible authentication or move auth logic to API routes
+// Handle Supabase session update
 async function handleSupabaseSession(request, response) {
-  // Currently disabled - this would require @supabase/ssr which has Edge Runtime issues
-  return response
+  // Skip if Supabase env vars are not configured
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return response
+  }
+
+  try {
+    // Trim whitespace and remove any newlines from env vars
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL.trim().replace(/[\r\n]/g, '')
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.trim().replace(/[\r\n]/g, '')
+
+    const supabase = createServerClient(
+      url,
+      key,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value)
+            )
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    // Protect admin routes
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+      if (!user) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/auth/login'
+        url.searchParams.set('redirectTo', request.nextUrl.pathname)
+        return NextResponse.redirect(url)
+      }
+    }
+
+    return response
+  } catch (error) {
+    console.error('Middleware Supabase error:', error)
+    return response
+  }
 }
 
 export async function middleware(request) {
@@ -112,15 +155,15 @@ export async function middleware(request) {
       }
     }
 
-    // Create base response and return directly
-    // TODO: Re-enable Supabase after fixing Edge Runtime compatibility
-    return NextResponse.next()
+    // Create base response
+    const response = NextResponse.next()
 
     // Handle Supabase session for all routes (only if env vars are configured)
-    // Temporarily disabled to isolate middleware error
-    // if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    //   return await handleSupabaseSession(request, response)
-    // }
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return await handleSupabaseSession(request, response)
+    }
+
+    return response
   } catch (error) {
     console.error('Middleware error:', error, {
       pathname: request.nextUrl?.pathname,
