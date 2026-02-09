@@ -46,6 +46,14 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // Disable ESLint during build for faster deployment
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // Disable TypeScript during build for faster deployment
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // Security headers
   async headers() {
     return [

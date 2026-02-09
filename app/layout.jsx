@@ -2,6 +2,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import PWARegistrar from './components/pwa-registrar'
 
 // Root metadata - will be overridden by locale layouts
 export const metadata = {
@@ -15,6 +16,21 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Portfolio',
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' },
+    ],
   },
 }
 
@@ -35,6 +51,12 @@ export default function RootLayout({ children }) {
       <head>
         {/* DNS prefetch for Supabase */}
         <link rel="dns-prefetch" href="https://supabase.co" />
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/manifest.json" />
+        {/* Apple Touch Icon */}
+        <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
+        {/* Theme Color */}
+        <meta name="theme-color" content="#667eea" />
       </head>
       <body className="font-sans antialiased">
         <Providers>
@@ -42,6 +64,7 @@ export default function RootLayout({ children }) {
             {children}
           </div>
         </Providers>
+        <PWARegistrar />
         <Analytics />
         <SpeedInsights />
       </body>

@@ -1,100 +1,61 @@
 'use client'
 
 import { ArrowRight, ExternalLink, Github, Youtube, Container, BookOpen } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-
-const projects = [
-  {
-    id: 1,
-    title: "PROJECT-LIBERTAD",
-    descriptionKey: "projectLibertad",
-    image: "/projects/project1.png",
-    tags: ["python", "docker", "automation", "telegram", "mtproto", "web-scraping", "smtp", "vmess", "telethon", "proxy-scraper", "vless", "runonflux"],
-    demoUrl: "https://github.com/SireJeff/interpolationTechniques",
-    githubUrl: "https://github.com/SireJeff/interpolationTechniques",
-  },
-  {
-    id: 2,
-    title: "interpolationTechniques",
-    descriptionKey: "interpolationTechniques",
-    image: "/projects/project2.png",
-    tags: ["python", "interpolation", "spline", "newtonian"],
-    demoUrl: "https://github.com/SireJeff/interpolationTechniques",
-    githubUrl: "https://github.com/SireJeff/interpolationTechniques",
-  },
-  {
-    id: 3,
-    title: "Restaurant_data_analysis",
-    descriptionKey: "restaurantDataAnalysis",
-    image: "/projects/project3.jpg",
-    tags: ["Python", "Pandas", "Data Analysis"],
-    demoUrl: "https://github.com/SireJeff/Restaurant_data_analysis",
-    githubUrl: "https://github.com/SireJeff/Restaurant_data_analysis",
-  },
-  {
-    id: 4,
-    title: "decentralized containerized ssh vpn on runonflux platform",
-    descriptionKey: "sshVpn",
-    image: "/projects/project4.jpg",
-    tags: ["Python", "Docker", "SSH", "VPN", "RunOnFlux"],
-    demoUrl: "https://github.com/SireJeff/fluxssh",
-    githubUrl: "https://github.com/SireJeff/fluxssh",
-  },
-  {
-    id: 5,
-    title: "NASTA",
-    descriptionKey: "nasta",
-    image: "/projects/project5.jpg",
-    tags: ["Python", "Data Analysis", "NASA"],
-    demoUrl: "https://github.com/SireJeff/Nasta",
-    githubUrl: "https://github.com/SireJeff/Nasta",
-  },
-  {
-    id: 6,
-    title: "TG_reminder",
-    descriptionKey: "tgReminder",
-    image: "/projects/project6.png",
-    tags: ["Python", "Telegram", "Reminders"],
-    demoUrl: "https://github.com/SireJeff/TG_reminder",
-    githubUrl: "https://github.com/SireJeff/TG_reminder",
-  },
-  {
-    id: 7,
-    title: "oscilation_simulation",
-    descriptionKey: "oscillationSimulation",
-    image: "/projects/project7.png",
-    tags: ["computational-physics", "wave-simulation", "mass-spring-systems", "coupled-oscillators", "normal-modes", "python", "numpy", "scipy", "matplotlib"],
-    demoUrl: "https://github.com/SireJeff/oscilation_simulation",
-    githubUrl: "https://github.com/SireJeff/oscilation_simulation",
-  },
-  {
-    id: 8,
-    title: "SKM construction company website",
-    descriptionKey: "skmWebsite",
-    image: "/projects/project8.png",
-    tags: ["web-development", "react", "tailwind-css", "javascript"],
-    demoUrl: "https://skm-co.ir",
-    githubUrl: "https://github.com/SireJeff/skm-co",
-  },
-  {
-    id: 9,
-    title: "UISSF - Universal Interconnected Systems of Smart Faculties",
-    descriptionKey: "uissf",
-    image: "/projects/project9.png",
-    tags: ["distributed-systems", "p2p-storage", "augmented-reality", "indoor-positioning", "smart-campus", "iot", "computer-vision", "research-proposal"],
-    demoUrl: "https://github.com/SireJeff/UISSF",
-    githubUrl: "https://github.com/SireJeff/UISSF",
-  },
-];
+import { getProjects } from "@/lib/actions/projects";
+import { getSiteSettings, getExternalLinks } from "@/lib/actions/settings";
+import Link from "next/link";
 
 export const ProjectsSection = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
-  
-  const projectsPerRow = 3; // Display 3 projects in the first row
+  const [projects, setProjects] = useState([]);
+  const [externalLinks, setExternalLinks] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const locale = i18n.language || 'en';
+
+  // Fetch projects and settings
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        const [projectsData, settingsData] = await Promise.all([
+          getProjects(),
+          getSiteSettings()
+        ]);
+
+        // Get external links from settings
+        const links = await getExternalLinks();
+        setExternalLinks(links);
+
+        setProjects(projectsData);
+      } catch (error) {
+        console.error("Failed to load projects:", error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const projectsPerRow = 3;
   const displayedProjects = isExpanded ? projects : projects.slice(0, projectsPerRow);
-  
+
+  if (loading) {
+    return (
+      <section id="projects" className="py-24 px-4 relative">
+        <div className="container mx-auto max-w-5xl">
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="projects" className="py-24 px-4 relative">
       <div className="container mx-auto max-w-5xl">
@@ -107,51 +68,64 @@ export const ProjectsSection = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayedProjects.map((project, key) => (
+          {displayedProjects.map((project) => (
             <div
-              key={key}
+              key={project.id}
               className="group bg-card rounded-lg overflow-hidden shadow-xs card-hover"
             >
               <div className="h-48 overflow-hidden">
                 <img
-                  src={project.image}
-                  alt={project.title}
+                  src={project.featured_image || '/placeholder-project.jpg'}
+                  alt={project.title_en}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>
 
               <div className="p-6">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map((tag, index) => (
-                    <span 
-                      key={`${project.id}-${index}`}
+                  {(project.tags || []).slice(0, 4).map((tag) => (
+                    <span
+                      key={tag.id}
                       className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground"
                     >
-                      {tag}
+                      {tag[`name_${locale}`] || tag.name_en}
                     </span>
                   ))}
+                  {(project.tags || []).length > 4 && (
+                    <span className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground">
+                      +{project.tags.length - 4}
+                    </span>
+                  )}
                 </div>
 
-                <h3 className="text-xl font-semibold mb-1"> {project.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  {t(`projects.projectDescriptions.${project.descriptionKey}`)}
+                <h3 className="text-xl font-semibold mb-1">
+                  {project[`title_${locale}`] || project.title_en}
+                </h3>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                  {project[`description_${locale}`] || project.description_en}
                 </p>
                 <div className="flex justify-between items-center">
                   <div className="flex space-x-3">
-                    <a
-                      href={project.demoUrl}
-                      target="_blank"
-                      className="text-foreground/80 hover:text-primary transition-colors duration-300"
-                    >
-                      <ExternalLink size={20} />
-                    </a>
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      className="text-foreground/80 hover:text-primary transition-colors duration-300"
-                    >
-                      <Github size={20} />
-                    </a>
+                    {project.demo_url && (
+                      <a
+                        href={project.demo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-foreground/80 hover:text-primary transition-colors duration-300"
+                      >
+                        <ExternalLink size={20} />
+                      </a>
+                    )}
+                    {project.github_url && (
+                      <a
+                        href={project.github_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-foreground/80 hover:text-primary transition-colors duration-300"
+                      >
+                        <Github size={20} />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
@@ -170,40 +144,39 @@ export const ProjectsSection = () => {
           </div>
         )}
 
+        {/* External Links Section - now from database */}
         <div className="text-center mt-12">
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
-              className="cosmic-button w-fit flex items-center gap-2"
-              target="_blank"
-              href="https://github.com/SireJeff"
-            >
-              <Github size={16} />
-              {t("projects.checkGithub")} <ArrowRight size={16} />
-            </a>
-            <a
-              className="cosmic-button w-fit flex items-center gap-2"
-              target="_blank"
-              href="https://www.youtube.com/@sire_jeff"
-            >
-              <Youtube size={16} />
-              {t("projects.watchVideos")} <ArrowRight size={16} />
-            </a>
-            <a
-              className="cosmic-button w-fit flex items-center gap-2"
-              target="_blank"
-              href="https://hub.docker.com/u/sandmanshiri"
-            >
-              <Container size={16} />
-              {t("projects.viewDockerImages")} <ArrowRight size={16} />
-            </a>
-            <a
-              className="cosmic-button w-fit flex items-center gap-2"
-              target="_blank"
-              href="https://virgool.io/@sandmanshiri"
-            >
-              <BookOpen size={16} />
-              {t("projects.readMyArticles")} <ArrowRight size={16} />
-            </a>
+            {externalLinks?.link1?.url && (
+              <a
+                className="cosmic-button w-fit flex items-center gap-2"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={externalLinks.link1.url}
+              >
+                {externalLinks.link1.icon === 'github' && <Github size={16} />}
+                {externalLinks.link1.icon === 'youtube' && <Youtube size={16} />}
+                {externalLinks.link1.icon === 'container' && <Container size={16} />}
+                {externalLinks.link1.icon === 'book' && <BookOpen size={16} />}
+                {externalLinks.link1[`name_${locale}`] || externalLinks.link1.name_en}
+                <ArrowRight size={16} />
+              </a>
+            )}
+            {externalLinks?.link2?.url && (
+              <a
+                className="cosmic-button w-fit flex items-center gap-2"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={externalLinks.link2.url}
+              >
+                {externalLinks.link2.icon === 'github' && <Github size={16} />}
+                {externalLinks.link2.icon === 'youtube' && <Youtube size={16} />}
+                {externalLinks.link2.icon === 'container' && <Container size={16} />}
+                {externalLinks.link2.icon === 'book' && <BookOpen size={16} />}
+                {externalLinks.link2[`name_${locale}`] || externalLinks.link2.name_en}
+                <ArrowRight size={16} />
+              </a>
+            )}
           </div>
         </div>
       </div>

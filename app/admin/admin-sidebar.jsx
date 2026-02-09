@@ -16,6 +16,9 @@ import {
   Image,
   Moon,
   Sun,
+  Award,
+  FolderKanban,
+  Edit,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -27,8 +30,11 @@ const navItems = [
   { name: 'Comments', href: '/admin/comments', icon: MessageSquare },
   { name: 'Chat', href: '/admin/chat', icon: MessagesSquare },
   { name: 'Media', href: '/admin/media', icon: Image },
+  { name: 'Skills', href: '/admin/skills', icon: Award },
+  { name: 'Projects', href: '/admin/projects', icon: FolderKanban },
   { name: 'Categories', href: '/admin/categories', icon: FolderOpen },
   { name: 'Tags', href: '/admin/tags', icon: Tags },
+  { name: 'Content', href: '/admin/content', icon: Edit },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
