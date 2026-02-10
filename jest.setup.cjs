@@ -1,5 +1,26 @@
 require('@testing-library/jest-dom')
 
+// Mock Supabase environment variables
+process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co'
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'.repeat(5) // Make it long enough
+process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-role-key'.repeat(5)
+
+// Mock next/headers for Supabase SSR client
+jest.mock('next/headers', () => ({
+  cookies: jest.fn(() => ({
+    getAll: jest.fn(() => []),
+    set: jest.fn(),
+    get: jest.fn(),
+    delete: jest.fn(),
+  })),
+}))
+
+// Mock next/cache for revalidatePath
+jest.mock('next/cache', () => ({
+  revalidatePath: jest.fn(),
+  revalidateTag: jest.fn(),
+}))
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter() {
