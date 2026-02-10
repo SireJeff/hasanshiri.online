@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getAdminSkills, getSkillCategories, deleteSkill } from '@/lib/actions/skills'
-import { AdminTable } from '@/components/admin/shared/admin-table'
+import { SkillsTable } from '@/components/admin/skills/skills-table'
 import Link from 'next/link'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // Note: Client components cannot export metadata
@@ -30,62 +30,6 @@ export default function SkillsAdminPage() {
     }
     loadData()
   }, [categoryId])
-
-  const categoryMap = Object.fromEntries(
-    categories.map(c => [c.id, c])
-  )
-
-  const columns = [
-    {
-      key: 'name_en',
-      label: 'Skill Name',
-      render: (value, row) => (
-        <div>
-          <p className="font-medium text-foreground">{value}</p>
-          {row.name_fa && (
-            <p className="text-sm text-muted-foreground" dir="rtl">{row.name_fa}</p>
-          )}
-        </div>
-      )
-    },
-    {
-      key: 'category_id',
-      label: 'Category',
-      render: (value) => {
-        const cat = categoryMap[value]
-        return cat ? (
-          <span
-            className="inline-block px-2 py-0.5 text-xs rounded text-white"
-            style={{ backgroundColor: cat.color }}
-          >
-            {cat.name_en}
-          </span>
-        ) : '—'
-      }
-    },
-    {
-      key: 'proficiency_level',
-      label: 'Level',
-      render: (value) => {
-        if (!value) return '—'
-        return (
-          <div className="flex items-center gap-2">
-            <div className="w-16 bg-secondary rounded-full h-2 overflow-hidden">
-              <div
-                className="h-full bg-primary"
-                style={{ width: `${value}%` }}
-              />
-            </div>
-            <span className="text-sm text-muted-foreground">{value}%</span>
-          </div>
-        )
-      }
-    },
-    {
-      key: 'sort_order',
-      label: 'Order'
-    }
-  ]
 
   const handleDelete = async (id) => {
     const result = await deleteSkill(id)
@@ -162,32 +106,11 @@ export default function SkillsAdminPage() {
       )}
 
       {/* Skills Table */}
-      <AdminTable
-        columns={columns}
-        data={skills}
-        emptyMessage="No skills found. Create your first skill to get started."
-        renderActions={(skill) => (
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/admin/skills/${skill.id}/edit`}
-              className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
-              title="Edit"
-            >
-              <Pencil size={16} />
-            </Link>
-            <button
-              onClick={() => {
-                if (confirm('Are you sure you want to delete this skill?')) {
-                  handleDelete(skill.id)
-                }
-              }}
-              className="p-2 text-muted-foreground hover:text-destructive hover:bg-secondary rounded-lg transition-colors"
-              title="Delete"
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
-        )}
+      <SkillsTable
+        skills={skills}
+        categories={categories}
+        onDelete={handleDelete}
+        categoryFilter={categoryId}
       />
     </div>
   )
