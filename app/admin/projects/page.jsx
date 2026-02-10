@@ -17,7 +17,7 @@ export default async function ProjectsAdminPage({
   const { projects } = await getAdminProjects({ status })
   // Fetched for future tag filtering feature
   // eslint-disable-next-line no-unused-vars -- Reserved for future tag filtering
-  const { tags } = await getProjectTags()
+  const tags = await getProjectTags() // Fixed: getProjectTags returns array directly, not { tags }
 
   const columns = [
     {
