@@ -1,4 +1,8 @@
-import { getAdminProjects, getProjectTags } from '@/lib/actions/projects'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { getAdminProjects, getProjectTags, deleteProject } from '@/lib/actions/projects'
 import { AdminTable } from '@/components/admin/shared/admin-table'
 import Link from 'next/link'
 import { Plus, Pencil, Trash2, Github as GithubIcon } from 'lucide-react'
@@ -8,16 +12,25 @@ export const metadata = {
   title: 'Projects | Admin',
 }
 
-export const dynamic = 'force-dynamic'
+export default function ProjectsAdminPage() {
+  const searchParams = useSearchParams()
+  const status = searchParams.get('status') || null
 
-export default async function ProjectsAdminPage({
-  searchParams,
-}) {
-  const status = searchParams.status || null
-  const { projects } = await getAdminProjects({ status })
-  // Fetched for future tag filtering feature
-  // eslint-disable-next-line no-unused-vars -- Reserved for future tag filtering
-  const tags = await getProjectTags() // Fixed: getProjectTags returns array directly, not { tags }
+  const [loading, setLoading] = useState(true)
+  const [projects, setProjects] = useState([])
+  const [tags, setTags] = useState([])
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true)
+      const { projects: projectsData } = await getAdminProjects({ status })
+      const tagsData = await getProjectTags()
+      setProjects(projectsData || [])
+      setTags(tagsData || [])
+      setLoading(false)
+    }
+    loadData()
+  }, [status])
 
   const columns = [
     {
@@ -76,6 +89,25 @@ export default async function ProjectsAdminPage({
       label: 'Order'
     }
   ]
+
+  const handleDelete = async (id) => {
+    const result = await deleteProject(id)
+    if (result.error) {
+      alert(result.error)
+    } else {
+      // Refresh data
+      const { projects: projectsData } = await getAdminProjects({ status })
+      setProjects(projectsData || [])
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -158,26 +190,17 @@ export default async function ProjectsAdminPage({
             >
               <Pencil size={16} />
             </Link>
-            <form
-              action={async () => {
-                'use server'
-                const { deleteProject } = await import('@/lib/actions/projects')
-                await deleteProject(project.id)
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this project?')) {
+                  handleDelete(project.id)
+                }
               }}
+              className="p-2 text-muted-foreground hover:text-destructive hover:bg-secondary rounded-lg transition-colors"
+              title="Delete"
             >
-              <button
-                type="submit"
-                className="p-2 text-muted-foreground hover:text-destructive hover:bg-secondary rounded-lg transition-colors"
-                title="Delete"
-                onClick={(e) => {
-                  if (!confirm('Are you sure you want to delete this project?')) {
-                    e.preventDefault()
-                  }
-                }}
-              >
-                <Trash2 size={16} />
-              </button>
-            </form>
+              <Trash2 size={16} />
+            </button>
           </div>
         )}
       />

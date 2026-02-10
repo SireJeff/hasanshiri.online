@@ -1,4 +1,8 @@
-import { getAdminSkills, getSkillCategories } from '@/lib/actions/skills'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { getAdminSkills, getSkillCategories, deleteSkill } from '@/lib/actions/skills'
 import { AdminTable } from '@/components/admin/shared/admin-table'
 import Link from 'next/link'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
@@ -8,14 +12,25 @@ export const metadata = {
   title: 'Skills | Admin',
 }
 
-export const dynamic = 'force-dynamic'
+export default function SkillsAdminPage() {
+  const searchParams = useSearchParams()
+  const categoryId = searchParams.get('category') || null
 
-export default async function SkillsAdminPage({
-  searchParams,
-}) {
-  const categoryId = searchParams.category || null
-  const { skills } = await getAdminSkills({ categoryId })
-  const categories = await getSkillCategories()
+  const [loading, setLoading] = useState(true)
+  const [skills, setSkills] = useState([])
+  const [categories, setCategories] = useState([])
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true)
+      const { skills: skillsData } = await getAdminSkills({ categoryId })
+      const categoriesData = await getSkillCategories()
+      setSkills(skillsData || [])
+      setCategories(categoriesData || [])
+      setLoading(false)
+    }
+    loadData()
+  }, [categoryId])
 
   const categoryMap = Object.fromEntries(
     categories.map(c => [c.id, c])
@@ -72,6 +87,25 @@ export default async function SkillsAdminPage({
       label: 'Order'
     }
   ]
+
+  const handleDelete = async (id) => {
+    const result = await deleteSkill(id)
+    if (result.error) {
+      alert(result.error)
+    } else {
+      // Refresh data
+      const { skills: skillsData } = await getAdminSkills({ categoryId })
+      setSkills(skillsData || [])
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -142,26 +176,17 @@ export default async function SkillsAdminPage({
             >
               <Pencil size={16} />
             </Link>
-            <form
-              action={async () => {
-                'use server'
-                const { deleteSkill } = await import('@/lib/actions/skills')
-                await deleteSkill(skill.id)
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this skill?')) {
+                  handleDelete(skill.id)
+                }
               }}
+              className="p-2 text-muted-foreground hover:text-destructive hover:bg-secondary rounded-lg transition-colors"
+              title="Delete"
             >
-              <button
-                type="submit"
-                className="p-2 text-muted-foreground hover:text-destructive hover:bg-secondary rounded-lg transition-colors"
-                title="Delete"
-                onClick={(e) => {
-                  if (!confirm('Are you sure you want to delete this skill?')) {
-                    e.preventDefault()
-                  }
-                }}
-              >
-                <Trash2 size={16} />
-              </button>
-            </form>
+              <Trash2 size={16} />
+            </button>
           </div>
         )}
       />
