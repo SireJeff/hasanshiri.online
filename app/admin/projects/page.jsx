@@ -8,9 +8,8 @@ import Link from 'next/link'
 import { Plus, Pencil, Trash2, Github as GithubIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export const metadata = {
-  title: 'Projects | Admin',
-}
+// Note: Client components cannot export metadata
+// Page title is handled by the admin layout
 
 export default function ProjectsAdminPage() {
   const searchParams = useSearchParams()
