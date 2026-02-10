@@ -1,6 +1,12 @@
 import { notFound } from 'next/navigation'
 import { i18nConfig, getLocaleDirection, generateAlternateUrls } from '@/lib/i18n-config'
 import { DirAttribute } from '@/components/DirAttribute'
+import {
+  NAME_VARIANTS,
+  TWITTER_HANDLE,
+  getCreatorName,
+  getAllNameVariants,
+} from '@/lib/config/seo-config'
 
 // Generate static params for all locales
 export function generateStaticParams() {
@@ -30,29 +36,50 @@ export async function generateMetadata({ params }) {
 
   const alternates = generateAlternateUrls('/', baseUrl)
 
+  // Get all name variants from centralized config
+  const allNameVariants = getAllNameVariants(locale)
+
   return {
     title: {
       default: titles[locale],
-      template: `%s | ${isRtl ? 'محمد حسن شیری' : 'Mohammad Hassan Shiri'}`,
+      template: `%s | ${NAME_VARIANTS.primary[locale]}`,
     },
     description: descriptions[locale],
-    keywords: [
-      'Mohammad Hassan Shiri',
-      'Hasan Shiri',
-      'محمد حسن شیری',
-      'حسن شیری',
-      'MHS',
-      'Physics Student',
-      'Data Scientist',
-      'Sharif University',
-      'Complex Systems',
-      'Python',
-      'Data Analysis',
-      'Machine Learning',
-      'Blog',
+    keywords: isRtl ? [
+      // نام و تغییرات آن (Name Variations)
+      ...allNameVariants,
+      // تخصصی اصلی (Core Technical)
+      'دیتاساینتیست', 'علم داده', 'دانشمند داده', 'تحلیلگر داده', 'محقق فیزیک', 'تحلیلگر سیستم‌های پیچیده',
+      // ابزارها و فناوری‌ها (Tools & Technologies)
+      'پایتون', 'Python', 'داکر', 'کوبرنتیس', 'گیت‌هاب', 'گیت', 'لینوکس',
+      'یادگیری ماشین', 'هوش مصنوعی', 'یادگیری عمیق', 'شبکه‌های عصبی',
+      // آموزش و affiliations (Education & Affiliation)
+      'دانشجوی فیزیک', 'دانشگاه شریف', 'دانشگاه صنعتی شریف', 'دانشگاه اصفهان',
+      // مکان‌محور (Location-Based)
+      'دیتاساینتیست ایران', 'دیتاساینتیست تهران', 'دانشجوی فیزیک ایران', 'تحلیلگر داده تهران',
+      // صنعت (Industry)
+      'دستیار پژوهشی', 'هوش تجاری', 'تحلیلگر بازار', 'فیزیک محاسباتی', 'مهندسی داده',
+      // انواع محتوا (Content Types)
+      'بلاگ', 'نمونه کار', 'وبلاگ فنی', 'بلاگ علم داده',
+    ] : [
+      // Name Variations (from centralized config)
+      ...allNameVariants,
+      // Core Technical
+      'Data Scientist', 'Machine Learning Engineer', 'Data Analyst', 'Physics Researcher', 'Complex Systems Analyst',
+      // Tools & Technologies
+      'Python Developer', 'Docker', 'Kubernetes', 'Git', 'Linux', 'SQL',
+      'Data Science', 'Artificial Intelligence', 'Deep Learning', 'Neural Networks',
+      // Education & Affiliation
+      'Sharif University', 'Sharif University of Technology', 'University of Isfahan', 'Physics Student',
+      // Location-Based
+      'Data Scientist Iran', 'Data Scientist Tehran', 'Iran Data Scientist', 'Tehran Data Analyst', 'Remote Data Scientist',
+      // Industry
+      'Research Assistant', 'Business Intelligence', 'Market Research Analyst', 'Computational Physics',
+      // Content Types
+      'Blog', 'Portfolio', 'Tech Blog', 'Data Science Blog',
     ],
-    authors: [{ name: isRtl ? 'محمد حسن شیری' : 'Mohammad Hassan Shiri' }],
-    creator: 'Mohammad Hassan Shiri',
+    authors: [{ name: NAME_VARIANTS.primary[locale] }],
+    creator: getCreatorName(locale),
     metadataBase: new URL(baseUrl),
     alternates: {
       canonical: `${baseUrl}/${locale}`,
@@ -63,14 +90,24 @@ export async function generateMetadata({ params }) {
       locale: isRtl ? 'fa_IR' : 'en_US',
       alternateLocale: isRtl ? 'en_US' : 'fa_IR',
       url: `${baseUrl}/${locale}`,
-      siteName: isRtl ? 'محمد حسن شیری' : 'Mohammad Hassan Shiri',
+      siteName: NAME_VARIANTS.primary[locale],
       title: titles[locale],
       description: descriptions[locale],
+      creator: getCreatorName(locale),
+      images: [
+        {
+          url: '/og-image-default.png',
+          width: 1200,
+          height: 630,
+          alt: titles[locale],
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: titles[locale],
       description: descriptions[locale],
+      creator: TWITTER_HANDLE, // No @ symbol - from centralized config
     },
     robots: {
       index: true,

@@ -43,5 +43,7 @@ export default async function sitemap() {
   )
 
   // Combine all entries
+  // Note: Projects are displayed on homepage, not as separate pages yet
+  // When project detail pages are added, include them here
   return [...staticEntries, ...articleEntries]
 }

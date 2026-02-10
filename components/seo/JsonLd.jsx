@@ -1,5 +1,13 @@
 // JSON-LD Structured Data Components for SEO
 
+// Import centralized SEO configuration
+import {
+  NAME_VARIANTS,
+  getPersonSchemaAlternateNames,
+  getSameAsArray,
+  ORGANIZATIONS,
+} from '@/lib/config/seo-config'
+
 // Base JSON-LD script component
 function JsonLdScript({ data }) {
   return (
@@ -28,12 +36,12 @@ export function ArticleJsonLd({ article, locale = 'en', url }) {
     dateModified: article.updated_at || article.published_at,
     author: {
       '@type': 'Person',
-      name: article.author?.full_name || 'Mohammad Hassan Shiri',
+      name: article.author?.full_name || NAME_VARIANTS.primary.en,
       url: 'https://hasanshiri.online',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Hasan Shiri',
+      name: NAME_VARIANTS.short.en,
       logo: {
         '@type': 'ImageObject',
         url: 'https://hasanshiri.online/logo.png',
@@ -77,18 +85,20 @@ export function PersonJsonLd({ locale = 'en' }) {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: isRtl ? 'محمد حسن شیری' : 'Mohammad Hassan Shiri',
-    alternateName: ['Hasan Shiri', 'MHS', 'حسن شیری'],
+    name: NAME_VARIANTS.primary[locale],
+    alternateName: getPersonSchemaAlternateNames(),
     url: 'https://hasanshiri.online',
     image: 'https://hasanshiri.online/your-photo.jpg',
     jobTitle: isRtl ? 'دانشجوی فیزیک و دانشمند داده' : 'Physics Student & Data Scientist',
     worksFor: {
       '@type': 'Organization',
-      name: isRtl ? 'دانشگاه صنعتی شریف' : 'Sharif University of Technology',
+      name: ORGANIZATIONS.sharif.name[locale],
+      url: ORGANIZATIONS.sharif.url,
     },
     alumniOf: {
       '@type': 'Organization',
-      name: 'Sharif University of Technology',
+      name: ORGANIZATIONS.sharif.name.en,
+      url: ORGANIZATIONS.sharif.url,
     },
     knowsAbout: [
       'Physics',
@@ -98,13 +108,7 @@ export function PersonJsonLd({ locale = 'en' }) {
       'Python',
       'Data Analysis',
     ],
-    sameAs: [
-      'https://github.com/SireJeff',
-      'https://linkedin.com/in/mohammadhasanshiri',
-      'https://x.com/MHasanshiri',
-      'https://youtube.com/@sire_jeff',
-      'https://t.me/@Mhasanshiri',
-    ],
+    sameAs: getSameAsArray(),
   }
 
   return <JsonLdScript data={data} />
@@ -115,16 +119,10 @@ export function OrganizationJsonLd() {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Hasan Shiri',
+    name: NAME_VARIANTS.short.en,
     url: 'https://hasanshiri.online',
     logo: 'https://hasanshiri.online/logo.png',
-    sameAs: [
-      'https://github.com/SireJeff',
-      'https://linkedin.com/in/mohammadhasanshiri',
-      'https://x.com/MHasanshiri',
-      'https://youtube.com/@sire_jeff',
-      'https://t.me/@Mhasanshiri',
-    ],
+    sameAs: getSameAsArray(),
   }
 
   return <JsonLdScript data={data} />
@@ -137,8 +135,12 @@ export function WebSiteJsonLd({ locale = 'en' }) {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: isRtl ? 'محمد حسن شیری' : 'Mohammad Hassan Shiri',
-    alternateName: 'Hasan Shiri',
+    name: NAME_VARIANTS.primary[locale],
+    alternateName: [
+      NAME_VARIANTS.short.en,
+      NAME_VARIANTS.initials.en,
+      NAME_VARIANTS.short.fa,
+    ],
     url: 'https://hasanshiri.online',
     inLanguage: ['en-US', 'fa-IR'],
     potentialAction: {
@@ -161,7 +163,7 @@ export function BlogJsonLd({ locale = 'en' }) {
   const data = {
     '@context': 'https://schema.org',
     '@type': 'Blog',
-    name: isRtl ? 'بلاگ حسن شیری' : 'Hasan Shiri Blog',
+    name: isRtl ? `بلاگ ${NAME_VARIANTS.short.fa}` : `${NAME_VARIANTS.short.en} Blog`,
     description: isRtl
       ? 'مقالاتی درباره فناوری، علم داده، فیزیک و سیستم‌های پیچیده'
       : 'Articles about technology, data science, physics, and complex systems',
@@ -169,12 +171,12 @@ export function BlogJsonLd({ locale = 'en' }) {
     inLanguage: isRtl ? 'fa-IR' : 'en-US',
     author: {
       '@type': 'Person',
-      name: 'Mohammad Hassan Shiri',
+      name: NAME_VARIANTS.primary.en,
       url: 'https://hasanshiri.online',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Hasan Shiri',
+      name: NAME_VARIANTS.short.en,
       url: 'https://hasanshiri.online',
     },
   }

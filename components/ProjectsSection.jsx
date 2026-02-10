@@ -76,7 +76,7 @@ export const ProjectsSection = () => {
               <div className="h-48 overflow-hidden">
                 <img
                   src={project.featured_image || '/placeholder-project.jpg'}
-                  alt={project.title_en}
+                  alt={project[`title_${locale}`] || project.title_en}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>

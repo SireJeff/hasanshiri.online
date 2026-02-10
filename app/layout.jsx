@@ -13,6 +13,16 @@ export const metadata = {
   },
   description:
     'Mohammad Hassan Shiri (MHS) - Physics Student at Sharif University, Data Scientist & Complex Systems Researcher.',
+  openGraph: {
+    images: [
+      {
+        url: '/og-image-default.png',
+        width: 1200,
+        height: 630,
+        alt: 'Mohammad Hassan Shiri | Portfolio & Blog',
+      },
+    ],
+  },
   robots: {
     index: true,
     follow: true,
