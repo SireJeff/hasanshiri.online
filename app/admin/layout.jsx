@@ -21,11 +21,12 @@ export default async function AdminLayout({ children }) {
   }
 
   // Get user profile to check admin role
-  const { data: profile } = await supabase
+  // Note: Profile might not exist for all users, handle gracefully
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .maybeSingle() // Use maybeSingle() instead of single() to handle no results gracefully
 
   // You can add role checking here if needed
   // For now, any authenticated user can access
