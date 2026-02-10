@@ -92,15 +92,47 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
     }
 
     try {
+      // Normalize the input - handle various formats:
+      // - https://github.com/username/repo
+      // - github.com/username/repo
+      // - username/repo
+      let normalizedRepo = repoName
+
+      // Remove GitHub URL prefix if present
+      if (normalizedRepo.includes('github.com/')) {
+        const parts = normalizedRepo.split('github.com/')
+        normalizedRepo = parts[parts.length - 1]
+      }
+
+      // Remove leading slash if present
+      normalizedRepo = normalizedRepo.replace(/^\/+/, '')
+
+      // Remove trailing slash if present
+      normalizedRepo = normalizedRepo.replace(/\/+$/, '')
+
+      // Remove .git suffix if present
+      normalizedRepo = normalizedRepo.replace(/\.git$/, '')
+
       // Extract owner and repo
-      const [owner, repo] = repoName.split('/')
-      if (!owner || !repo) {
-        throw new Error('Invalid GitHub repository format. Use "username/repo-name"')
+      const parts = normalizedRepo.split('/')
+      const [owner, repo] = parts
+
+      if (!owner || !repo || parts.length > 2) {
+        throw new Error('Invalid GitHub repository format. Use "username/repo-name" format (e.g., "facebook/react")')
+      }
+
+      // Validate owner and repo don't contain invalid characters
+      const validFormat = /^[a-zA-Z0-9_.-]+$/
+      if (!validFormat.test(owner) || !validFormat.test(repo)) {
+        throw new Error('Invalid repository name. Use only letters, numbers, hyphens, underscores, and dots.')
       }
 
       // Fetch from GitHub API
       const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`)
       if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error(`Repository "${owner}/${repo}" not found. Check the name and try again.`)
+        }
         throw new Error(`GitHub API error: ${response.statusText}`)
       }
 
@@ -109,15 +141,16 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
       // Auto-fill form fields
       setFormData(prev => ({
         ...prev,
-        title_en: repoData.name,
-        description_en: repoData.description || '',
-        github_url: repoData.html_url,
+        github_repo_name: `${owner}/${repo}`, // Store normalized format
+        title_en: repoData.name || prev.title_en,
+        description_en: repoData.description || prev.description_en,
+        github_url: repoData.html_url || prev.github_url,
         demo_url: repoData.homepage || prev.demo_url,
       }))
 
       setMessage({
         type: 'success',
-        text: `Successfully loaded data from GitHub: ${repoData.name}`
+        text: `Successfully loaded data from GitHub: ${repoData.full_name}`
       })
     } catch (error) {
       console.error('GitHub API error:', error)
