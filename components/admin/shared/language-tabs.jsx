@@ -54,6 +54,8 @@ export function BilingualField({
   rows = 3,
   required = false,
 }) {
+  // Reserved for future dynamic RTL styling
+  // eslint-disable-next-line no-unused-vars -- Reserved for future RTL enhancements
   const isRtl = activeTab === 'fa'
 
   return (

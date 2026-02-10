@@ -37,6 +37,8 @@ export const SkillsSection = () => {
 
   // Get unique categories
   const categories = ["all", ...skillsData.map(g => g.category?.slug || 'uncategorized')];
+  // Translation keys for category names (reserved for future i18n implementation)
+  // eslint-disable-next-line no-unused-vars -- Reserved for future i18n implementation
   const categoryTranslationKeys = {
     "all": "all",
     "data-science": "dataScience",

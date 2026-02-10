@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronUp, ChevronDown, MoreVertical } from 'lucide-react'
+import { ChevronUp, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
@@ -20,7 +20,7 @@ export function AdminTable({
   rowActions = null, // Additional actions for each row
 }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
-  const [expandedRow, setExpandedRow] = useState(null)
+  const [expandedRow, /* setExpandedRow */] = useState(null) // Toggle to be implemented
 
   const handleSort = (key) => {
     if (!sortable) return

@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getProjects } from "@/lib/actions/projects";
 import { getSiteSettings, getExternalLinks } from "@/lib/actions/settings";
-import Link from "next/link";
 
 export const ProjectsSection = () => {
   const { t, i18n } = useTranslation();
@@ -21,7 +20,7 @@ export const ProjectsSection = () => {
     async function loadData() {
       setLoading(true);
       try {
-        const [projectsData, settingsData] = await Promise.all([
+        const [projectsData, /* settingsData */] = await Promise.all([
           getProjects(),
           getSiteSettings()
         ]);

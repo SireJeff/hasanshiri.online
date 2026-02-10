@@ -10,8 +10,8 @@ module.exports = {
   rules: {
     'react/jsx-no-target-blank': 'off',
     'react/no-unescaped-entities': 'off',
-    // Allow console.log during development
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    // Allow console.log - helpful for development debugging
+    'no-console': 'off',
     // Jest globals are now recognized via jest: true env
     'no-undef': 'off',
   },

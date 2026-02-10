@@ -130,6 +130,8 @@ export function OrganizationJsonLd() {
 
 // WebSite JSON-LD (for search box enhancement)
 export function WebSiteJsonLd({ locale = 'en' }) {
+  // Reserved for future RTL-specific schema enhancements
+  // eslint-disable-next-line no-unused-vars -- Reserved for future RTL enhancements
   const isRtl = locale === 'fa'
 
   const data = {

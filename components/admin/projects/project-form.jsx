@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Loader2, Github as GithubIcon, ExternalLink, Image as ImageIcon } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, Github as GithubIcon, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { createProject, updateProject, getProjectTags } from '@/lib/actions/projects'
 import { LanguageTabs, BilingualField } from '@/components/admin/shared/language-tabs'
