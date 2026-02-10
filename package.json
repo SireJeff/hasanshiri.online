@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "pwa:icons": "node scripts/generate-pwa-icons.js"
+    "pwa:icons": "node scripts/generate-pwa-icons.js",
+    "import:i18n": "node scripts/import-i18n-data.js"
   },
   "dependencies": {
     "@emailjs/browser": "^3.11.0",
@@ -60,6 +61,7 @@
     "@types/react": "^18.2.22",
     "@types/react-dom": "^18.2.7",
     "autoprefixer": "^10.4.15",
+    "dotenv": "^17.2.4",
     "eslint": "^8.49.0",
     "eslint-config-next": "^14.2.21",
     "jest": "^30.2.0",
