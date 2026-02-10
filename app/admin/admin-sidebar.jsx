@@ -45,6 +45,11 @@ export function AdminSidebar({ user, profile }) {
   const [isDark, setIsDark] = useState(false)
   const supabase = createClient()
 
+  // Guard against undefined user/profile
+  if (!user) {
+    return null
+  }
+
   // Initialize dark mode state from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -162,12 +167,12 @@ export function AdminSidebar({ user, profile }) {
                 {profile?.avatar_url ? (
                   <img
                     src={profile.avatar_url}
-                    alt={profile.full_name || user.email}
+                    alt={profile?.full_name || user?.email || 'User'}
                     className="w-full h-full object-cover"
                   />
                 ) : (
                   <span className="text-primary font-medium">
-                    {(profile?.full_name || user.email || 'A')[0].toUpperCase()}
+                    {(profile?.full_name || user?.email || 'A')[0]?.toUpperCase() || 'A'}
                   </span>
                 )}
               </div>
@@ -175,7 +180,7 @@ export function AdminSidebar({ user, profile }) {
                 <p className="text-sm font-medium text-foreground truncate">
                   {profile?.full_name || 'Admin'}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
               </div>
             </div>
 
