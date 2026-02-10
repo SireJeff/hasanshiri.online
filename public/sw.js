@@ -4,10 +4,11 @@ const CACHE_VERSION = 'v1'
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`
 
 // Static assets to cache on install
+// Note: Only include URLs that exist and respond successfully
 const STATIC_ASSETS = [
-  '/',
+  '/', // Homepage
   '/manifest.json',
-  '/offline',
+  // '/offline' - Remove: offline page doesn't exist yet, causing cache.addAll() to fail
 ]
 
 // Cache patterns for runtime caching
@@ -120,8 +121,16 @@ self.addEventListener('install', (event) => {
 
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then((cache) => {
+        console.log('[SW] Caching static assets:', STATIC_ASSETS)
+        return cache.addAll(STATIC_ASSETS)
+      })
       .then(() => self.skipWaiting())
+      .catch((error) => {
+        console.error('[SW] Failed to cache static assets:', error)
+        // Still activate the service worker even if caching fails
+        return self.skipWaiting()
+      })
   )
 })
 
