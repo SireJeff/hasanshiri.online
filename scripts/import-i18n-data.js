@@ -10,11 +10,19 @@
 
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
-import enLocale from '../lib/locales/en.json'
-import faLocale from '../lib/locales/fa.json'
+import { readFileSync } from 'fs'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 
-// Load environment variables
-dotenv.config()
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+// Load environment variables - explicitly load .env.local
+dotenv.config({ path: '.env.local' })
+
+// Load JSON files manually
+const enLocale = JSON.parse(readFileSync(join(__dirname, '../lib/locales/en.json'), 'utf-8'))
+const faLocale = JSON.parse(readFileSync(join(__dirname, '../lib/locales/fa.json'), 'utf-8'))
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY // Use service role for admin operations
