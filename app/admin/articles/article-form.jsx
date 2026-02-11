@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { createArticle, updateArticle, generateSlug } from '@/lib/actions/articles'
 import { ImageUpload } from '@/components/editor/ImageUpload'
+import { TranslateButton, FieldTranslateButton, TranslationResult } from '@/components/admin/shared/translate-button'
 import { Save, Eye, ArrowLeft, Loader2, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 
@@ -24,6 +25,10 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
   const [isPending, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState('en')
   const [errors, setErrors] = useState({})
+  const [translationErrors, setTranslationErrors] = useState([])
+
+  // Determine translation direction based on active tab
+  const translationDirection = activeTab === 'en' ? 'en2fa' : 'fa2en'
 
   // Form state
   const [formData, setFormData] = useState({
@@ -75,6 +80,28 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
     if (!formData.content_en.trim()) newErrors.content_en = 'English content is required'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
+  }
+
+  const handleTranslationComplete = (translations, errors) => {
+    // Update form data with translations
+    for (const [field, value] of Object.entries(translations)) {
+      updateField(field, value)
+    }
+    if (errors && errors.length > 0) {
+      setTranslationErrors(errors)
+    } else {
+      setTranslationErrors([])
+    }
+  }
+
+  const handleFieldTranslation = (field, translated) => {
+    updateField(field, translated)
+    // Clear translation errors when successful
+    setTranslationErrors([])
+  }
+
+  const handleTranslationError = (error) => {
+    setErrors({ submit: `Translation failed: ${error}` })
   }
 
   const handleSubmit = async (status = null) => {
@@ -161,8 +188,22 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
             <Save className="w-4 h-4" />
             Publish
           </button>
+          {/* Translate All Button */}
+          <TranslateButton
+            data={formData}
+            direction={translationDirection}
+            fields={['title', 'excerpt', 'content']}
+            onTranslationComplete={handleTranslationComplete}
+            onError={handleTranslationError}
+            disabled={isPending}
+          />
         </div>
       </div>
+
+      {/* Translation Result Display */}
+      {translationErrors.length > 0 && (
+        <TranslationResult errors={translationErrors} />
+      )}
 
       {errors.submit && (
         <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500">
@@ -201,9 +242,18 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
           {activeTab === 'en' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Title (English) *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-foreground">
+                    Title (English) *
+                  </label>
+                  <FieldTranslateButton
+                    text={formData.title_en}
+                    field="title_fa"
+                    direction="en2fa"
+                    onTranslationComplete={(translated) => handleFieldTranslation('title_fa', translated)}
+                    onError={handleTranslationError}
+                  />
+                </div>
                 <input
                   type="text"
                   value={formData.title_en}
@@ -219,9 +269,18 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Excerpt (English)
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-foreground">
+                    Excerpt (English)
+                  </label>
+                  <FieldTranslateButton
+                    text={formData.excerpt_en}
+                    field="excerpt_fa"
+                    direction="en2fa"
+                    onTranslationComplete={(translated) => handleFieldTranslation('excerpt_fa', translated)}
+                    onError={handleTranslationError}
+                  />
+                </div>
                 <textarea
                   value={formData.excerpt_en}
                   onChange={(e) => updateField('excerpt_en', e.target.value)}
@@ -232,9 +291,19 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  Content (English) *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-foreground">
+                    Content (English) *
+                  </label>
+                  <FieldTranslateButton
+                    text={formData.content_en}
+                    field="content_fa"
+                    direction="en2fa"
+                    isHTML={true}
+                    onTranslationComplete={(translated) => handleFieldTranslation('content_fa', translated)}
+                    onError={handleTranslationError}
+                  />
+                </div>
                 <TipTapEditor
                   content={formData.content_en}
                   onChange={(html) => updateField('content_en', html)}
@@ -251,9 +320,18 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
           {activeTab === 'fa' && (
             <div className="space-y-4" dir="rtl">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  عنوان (فارسی) *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-foreground">
+                    عنوان (فارسی) *
+                  </label>
+                  <FieldTranslateButton
+                    text={formData.title_fa}
+                    field="title_en"
+                    direction="fa2en"
+                    onTranslationComplete={(translated) => handleFieldTranslation('title_en', translated)}
+                    onError={handleTranslationError}
+                  />
+                </div>
                 <input
                   type="text"
                   value={formData.title_fa}
@@ -269,9 +347,18 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  خلاصه (فارسی)
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-foreground">
+                    خلاصه (فارسی)
+                  </label>
+                  <FieldTranslateButton
+                    text={formData.excerpt_fa}
+                    field="excerpt_en"
+                    direction="fa2en"
+                    onTranslationComplete={(translated) => handleFieldTranslation('excerpt_en', translated)}
+                    onError={handleTranslationError}
+                  />
+                </div>
                 <textarea
                   value={formData.excerpt_fa}
                   onChange={(e) => updateField('excerpt_fa', e.target.value)}
@@ -282,9 +369,19 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">
-                  محتوا (فارسی)
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-foreground">
+                    محتوا (فارسی)
+                  </label>
+                  <FieldTranslateButton
+                    text={formData.content_fa}
+                    field="content_en"
+                    direction="fa2en"
+                    isHTML={true}
+                    onTranslationComplete={(translated) => handleFieldTranslation('content_en', translated)}
+                    onError={handleTranslationError}
+                  />
+                </div>
                 <TipTapEditor
                   content={formData.content_fa}
                   onChange={(html) => updateField('content_fa', html)}

@@ -79,6 +79,12 @@
       "uissf": "Research proposal for a global distributed network of smart campuses for University of Isfahan engineering faculties. UISSF combines P2P file storage, indoor positioning systems, and immersive technologies (AR/VR/MR) to create fundamental infrastructure for AI, IoT, computer vision, and digital evolution technologies."
     }
   },
+  "articles": {
+    "title": "Latest",
+    "articles": "Articles",
+    "description": "Explore my thoughts, tutorials, and insights on technology, data science, and complex systems.",
+    "viewAll": "View all articles"
+  },
   "contact": {
     "title": "Get In",
     "touch": "Touch",

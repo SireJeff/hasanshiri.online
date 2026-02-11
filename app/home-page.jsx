@@ -6,6 +6,7 @@ import { HeroSection } from '@/components/HeroSection'
 import { AboutSection } from '@/components/AboutSection'
 import { SkillsSection } from '@/components/SkillsSection'
 import { ProjectsSection } from '@/components/ProjectsSection'
+import { ArticlesSection } from '@/components/ArticlesSection'
 import { ContactSection } from '@/components/ContactSection'
 import { Footer } from '@/components/Footer'
 import { PersonJsonLd, WebSiteJsonLd, OrganizationJsonLd } from '@/components/seo/JsonLd'
@@ -53,6 +54,7 @@ export function HomePage({ locale = 'en' }) {
           <AboutSection locale={locale} />
           <SkillsSection locale={locale} />
           <ProjectsSection locale={locale} />
+          <ArticlesSection locale={locale} />
           <ContactSection locale={locale} />
         </main>
 
