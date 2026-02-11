@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { getAdminProjects, getProjectTags, deleteProject } from '@/lib/actions/projects'
+import { getAdminProjects, deleteProject } from '@/lib/actions/projects'
 import { ProjectsTable } from '@/components/admin/projects/projects-table'
 import Link from 'next/link'
 import { Plus, Github as GithubIcon } from 'lucide-react'

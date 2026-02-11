@@ -3,7 +3,9 @@ import { ArticleCard, ArticleCardSkeleton } from '@/components/blog/ArticleCard'
 
 // Mock next/link
 jest.mock('next/link', () => {
-  return ({ children, href }) => <a href={href}>{children}</a>
+  const MockLink = ({ children, href }) => <a href={href}>{children}</a>
+  MockLink.displayName = 'MockLink'
+  return MockLink
 })
 
 describe('ArticleCard', () => {

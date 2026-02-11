@@ -4,8 +4,6 @@ test.describe('Accessibility', () => {
   test('homepage has no critical accessibility issues', async ({ page }) => {
     await page.goto('/en')
 
-    // Check for skip link (optional but good practice)
-    const skipLink = page.locator('a[href="#main-content"], a[href="#content"]')
     // Skip links may not be present in all designs
 
     // Check main landmark exists
@@ -179,15 +177,8 @@ test.describe('Accessibility', () => {
     })
 
     // Element should have some form of focus indicator
-    if (focusedElement) {
-      const hasFocusIndicator =
-        focusedElement.hasOutline ||
-        focusedElement.hasBoxShadow ||
-        focusedElement.hasBorder
-
-      // This is a soft check - focus styles may be handled differently
-      expect(focusedElement).toBeTruthy()
-    }
+    // This is a soft check - focus styles may be handled differently
+    expect(focusedElement).toBeTruthy()
   })
 
   test('Persian page has proper RTL support', async ({ page }) => {

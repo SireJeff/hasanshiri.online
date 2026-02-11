@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '../utils/test-utils'
+import { render, screen, waitFor } from '../utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import { CommentForm } from '@/components/comments/CommentForm'
 

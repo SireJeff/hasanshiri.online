@@ -10,11 +10,6 @@
 
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'
-import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 // Load environment variables
 dotenv.config({ path: '.env.local' })
@@ -110,7 +105,7 @@ async function createProjectTags() {
   console.log('\n🏷️  Creating Project Tags...')
 
   for (const tag of projectTags) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('project_tags')
       .upsert(tag, { onConflict: 'slug' })
 

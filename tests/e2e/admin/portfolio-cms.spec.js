@@ -22,7 +22,6 @@ test.describe('Portfolio CMS Admin', () => {
       // Note: This test requires authentication setup
       // For now, just check the admin structure exists
       await page.goto('/admin')
-      const adminSidebar = page.locator('[data-testid="admin-sidebar"]')
       // The sidebar should exist even if redirected to login
     })
   })

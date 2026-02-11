@@ -35,8 +35,6 @@ test.describe('Admin', () => {
     // Check for email/password fields or OAuth buttons
     const emailField = page.getByLabel(/email/i)
       .or(page.getByPlaceholder(/email/i))
-    const passwordField = page.getByLabel(/password/i)
-      .or(page.getByPlaceholder(/password/i))
     const githubButton = page.getByRole('button', { name: /github/i })
 
     // Should have some form of login

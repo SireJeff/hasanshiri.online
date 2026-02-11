@@ -21,12 +21,8 @@ test.describe('SEO', () => {
   test('page has Open Graph tags', async ({ page }) => {
     await page.goto('/en')
 
-    // Check OG tags
+    // Check OG tags - at least og:title should exist
     const ogTitle = page.locator('meta[property="og:title"]')
-    const ogDescription = page.locator('meta[property="og:description"]')
-    const ogType = page.locator('meta[property="og:type"]')
-
-    // At least og:title should exist
     const hasOgTitle = await ogTitle.count() > 0
     expect(hasOgTitle).toBeTruthy()
   })

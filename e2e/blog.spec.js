@@ -26,10 +26,6 @@ test.describe('Blog', () => {
   test('blog page has category filter', async ({ page }) => {
     await page.goto('/en/blog')
 
-    // Look for category buttons or dropdown
-    const categoryFilter = page.locator('[data-testid="category-filter"]')
-      .or(page.getByRole('button', { name: /all|category|filter/i }))
-
     // Page should be functional
     await expect(page.locator('main')).toBeVisible()
   })
@@ -50,11 +46,6 @@ test.describe('Blog', () => {
 
   test('pagination works if present', async ({ page }) => {
     await page.goto('/en/blog')
-
-    // Look for pagination
-    const pagination = page.locator('[data-testid="pagination"]')
-      .or(page.getByRole('navigation', { name: /pagination/i }))
-      .or(page.locator('nav').filter({ hasText: /1|2|next|previous/i }))
 
     // Page should load successfully regardless of pagination
     await expect(page.locator('main')).toBeVisible()

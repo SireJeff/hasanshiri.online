@@ -33,7 +33,7 @@ Sentry.init({
   ],
 
   // Before sending error
-  beforeSend(event, hint) {
+  beforeSend(event) {
     // Filter out errors from browser extensions
     if (event.exception?.values?.[0]?.stacktrace?.frames) {
       const frames = event.exception.values[0].stacktrace.frames

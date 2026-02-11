@@ -290,7 +290,7 @@ async function importSkillCategories() {
   console.log('\n📁 Importing Skill Categories...')
 
   for (const category of skillCategoriesData) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('skill_categories')
       .upsert(category, { onConflict: 'slug' })
 
@@ -315,7 +315,7 @@ async function importSkills(categoryIdMap) {
   for (const skill of skillsData) {
     const category_id = categoryIdMap[skill.category_slug]
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('skills')
       .upsert({
         slug: skill.slug,
@@ -337,7 +337,7 @@ async function importProjects() {
   console.log('\n🚀 Importing Projects...')
 
   for (const project of projectsData) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('projects')
       .upsert(project, { onConflict: 'slug' })
 

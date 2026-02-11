@@ -45,11 +45,6 @@ export function AdminSidebar({ user, profile }) {
   const [isDark, setIsDark] = useState(false)
   const supabase = createClient()
 
-  // Guard against undefined user/profile
-  if (!user) {
-    return null
-  }
-
   // Initialize dark mode state from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme')
@@ -58,6 +53,11 @@ export function AdminSidebar({ user, profile }) {
     setIsDark(isDarkMode)
     document.documentElement.classList.toggle('dark', isDarkMode)
   }, [])
+
+  // Guard against undefined user/profile
+  if (!user) {
+    return null
+  }
 
   const toggleDarkMode = () => {
     const newDarkMode = !isDark

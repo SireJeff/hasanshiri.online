@@ -68,8 +68,6 @@ test.describe('Homepage', () => {
   test('chat widget is visible', async ({ page }) => {
     await page.goto('/en')
 
-    // Chat widget should be visible on homepage
-    const chatWidget = page.locator('[data-testid="chat-widget"]').or(page.locator('button').filter({ hasText: /chat|message/i }))
     // Chat widget might not be visible initially - just check the page loads
     await expect(page).toHaveTitle(/.+/)
   })
