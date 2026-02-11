@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import Link from 'next/link'
-import { ArticleCard, ArticleCardSkeleton } from '@/components/blog/ArticleCard'
+import { ArticleCard } from '@/components/blog/ArticleCard'
 import { getHomepageArticles } from '@/lib/actions/articles'
 
 export const ArticlesSection = () => {
