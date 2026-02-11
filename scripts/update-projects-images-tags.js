@@ -2,6 +2,7 @@
  * Update Projects with Images and Tags
  *
  * This script adds featured images and project tags to the imported projects.
+ * Tags are stored using the project_tag_relations junction table.
  *
  * Usage:
  *   node scripts/update-projects-images-tags.js
@@ -42,10 +43,11 @@ const projectTags = [
   { slug: 'kubernetes', name_en: 'Kubernetes', name_fa: 'کوبرنتیز' },
   { slug: 'physics', name_en: 'Physics', name_fa: 'فیزیک' },
   { slug: 'data-science', name_en: 'Data Science', name_fa: 'علم داده' },
-  { slug: 'api', name_en: 'API', name_fa 'API' },
+  { slug: 'api', name_en: 'API', name_fa: 'API' },
   { slug: 'nasa', name_en: 'NASA', name_fa: 'ناسا' },
   { slug: 'web-development', name_en: 'Web Development', name_fa: 'توسعه وب' },
   { slug: 'automation', name_en: 'Automation', name_fa: 'اتوماسیون' },
+  { slug: 'research', name_en: 'Research', name_fa: 'پژوهش' },
 ]
 
 // ============================================
@@ -136,6 +138,17 @@ async function updateProjectsWithImagesAndTags() {
       continue
     }
 
+    // Update project with featured image
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({ featured_image: projectUpdate.featured_image })
+      .eq('id', project.id)
+
+    if (updateError) {
+      console.error(`❌ Error updating image for ${projectUpdate.slug}:`, updateError.message)
+      continue
+    }
+
     // Get tag IDs for this project
     const tagIds = []
     for (const tagSlug of projectUpdate.tags) {
@@ -147,36 +160,38 @@ async function updateProjectsWithImagesAndTags() {
 
       if (tag) {
         tagIds.push(tag.id)
+      } else {
+        console.warn(`⚠️  Tag not found: ${tagSlug}`)
       }
     }
 
-    // Update project with image and get current tags
-    const { data: currentProject } = await supabase
-      .from('projects')
-      .select('tag_ids')
-      .eq('id', project.id)
-      .single()
+    // Delete existing tag relations for this project
+    await supabase
+      .from('project_tag_relations')
+      .delete()
+      .eq('project_id', project.id)
 
-    // Merge new tags with existing tags (avoid duplicates)
-    const existingTagIds = currentProject?.tag_ids || []
-    const allTagIds = [...new Set([...existingTagIds, ...tagIds])]
+    // Insert new tag relations using junction table
+    if (tagIds.length > 0) {
+      const relations = tagIds.map(tagId => ({
+        project_id: project.id,
+        tag_id: tagId
+      }))
 
-    // Update project
-    const { data, error } = await supabase
-      .from('projects')
-      .update({
-        featured_image: projectUpdate.featured_image,
-        tag_ids: allTagIds
-      })
-      .eq('id', project.id)
-      .select()
+      const { error: relationError } = await supabase
+        .from('project_tag_relations')
+        .insert(relations)
 
-    if (error) {
-      console.error(`❌ Error updating project ${projectUpdate.slug}:`, error.message)
+      if (relationError) {
+        console.error(`❌ Error adding tags for ${projectUpdate.slug}:`, relationError.message)
+      } else {
+        console.log(`✅ Updated: ${projectUpdate.slug}`)
+        console.log(`   Image: ${projectUpdate.featured_image}`)
+        console.log(`   Tags: ${projectUpdate.tags.join(', ')}`)
+      }
     } else {
-      console.log(`✅ Updated: ${projectUpdate.slug}`)
+      console.log(`✅ Updated (image only): ${projectUpdate.slug}`)
       console.log(`   Image: ${projectUpdate.featured_image}`)
-      console.log(`   Tags: ${projectUpdate.tags.join(', ')}`)
     }
   }
 }
