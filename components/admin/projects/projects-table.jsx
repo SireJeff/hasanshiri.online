@@ -2,14 +2,13 @@
 
 import { AdminTable } from '@/components/admin/shared/admin-table'
 import Link from 'next/link'
-import { Plus, Pencil, Trash2, Github as GithubIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Pencil, Trash2, Github as GithubIcon } from 'lucide-react'
 
 /**
  * Projects Table Component
  * Columns are defined internally to avoid serialization issues
  */
-export function ProjectsTable({ projects, onDelete, statusFilter }) {
+export function ProjectsTable({ projects, onDelete }) {
   // Define columns internally to avoid serialization across component boundaries
   const columns = [
     {

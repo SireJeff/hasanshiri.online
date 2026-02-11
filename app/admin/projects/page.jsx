@@ -17,15 +17,12 @@ export default function ProjectsAdminPage() {
 
   const [loading, setLoading] = useState(true)
   const [projects, setProjects] = useState([])
-  const [tags, setTags] = useState([])
 
   useEffect(() => {
     async function loadData() {
       setLoading(true)
       const { projects: projectsData } = await getAdminProjects({ status })
-      const tagsData = await getProjectTags()
       setProjects(projectsData || [])
-      setTags(tagsData || [])
       setLoading(false)
     }
     loadData()

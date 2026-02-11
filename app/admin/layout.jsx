@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }) {
 
   // Get user profile to check admin role
   // Note: Profile might not exist for all users, handle gracefully
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)

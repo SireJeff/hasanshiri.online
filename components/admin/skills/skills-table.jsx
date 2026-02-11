@@ -3,13 +3,12 @@
 import { AdminTable } from '@/components/admin/shared/admin-table'
 import Link from 'next/link'
 import { Pencil, Trash2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 /**
  * Skills Table Component
  * Columns are defined internally to avoid serialization issues
  */
-export function SkillsTable({ skills, categories, onDelete, categoryFilter }) {
+export function SkillsTable({ skills, categories, onDelete }) {
   // Create category map for rendering
   const categoryMap = Object.fromEntries(
     categories.map(c => [c.id, c])
