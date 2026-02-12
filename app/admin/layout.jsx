@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AdminSidebar } from './admin-sidebar'
+import { FloatingAIAssistant } from '@/components/admin/shared/FloatingAIAssistant'
+import { AIProvider } from '@/components/admin/shared/AIContext'
 
 export const metadata = {
   title: {
@@ -32,11 +34,14 @@ export default async function AdminLayout({ children }) {
   // For now, any authenticated user can access
 
   return (
-    <div className="min-h-screen bg-background">
-      <AdminSidebar user={user} profile={profile} />
-      <div className="lg:pl-64">
-        <main className="p-6">{children}</main>
+    <AIProvider>
+      <div className="min-h-screen bg-background">
+        <AdminSidebar user={user} profile={profile} />
+        <FloatingAIAssistant />
+        <div className="lg:pl-64">
+          <main className="p-6">{children}</main>
+        </div>
       </div>
-    </div>
+    </AIProvider>
   )
 }
