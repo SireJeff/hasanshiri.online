@@ -24,7 +24,26 @@
     "title": "Analytical Researcher | Complex Systems Enthusiast | Data Scientist",
     "description": "An inquisitive Physics undergraduate at Sharif University with a deep-seated passion for modeling complex systems and leveraging data to uncover foundational insights.",
     "getInTouch": "Get In Touch",
-    "downloadCV": "Download CV"
+    "downloadCV": "Download CV",
+    "assistant": "AI Assistant",
+    "translate": "Translate",
+    "generate": "Generate",
+    "refine": "Refine",
+    "selectModel": "Select Model",
+    "quickActions": "Quick Actions",
+    "minimize": "Minimize",
+    "close": "Close",
+    "send": "Send",
+    "clearHistory": "Clear History",
+    "translatePlaceholder": "Enter text to translate...",
+    "generatePlaceholder": "Enter topic to generate content...",
+    "refinePlaceholder": "Enter content to refine...",
+    "inputPlaceholder": "Type your message...",
+    "presetSettings": "Preset Settings",
+    "presetSaved": "Presets saved successfully",
+    "presetError": "Failed to save presets",
+    "noPresetConfigured": "No preset configured. Please set a preset in AI Settings.",
+    "save": "Save"
   },
   "about": {
     "title": "About",
@@ -114,7 +133,8 @@
     }
   },
   "footer": {
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "save": "Save"
   },
   "comments": {
     "title": "Comments",
