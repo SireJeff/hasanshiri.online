@@ -1,7 +1,6 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
-import { streamChatCompletion } from '@/lib/openrouter'
 import { getUserPresets as fetchUserPresetsServer, updateUserPresets as saveUserPresetsServer } from '@/lib/actions/ai'
 import { createClient } from '@/lib/supabase/server'
 
@@ -15,7 +14,7 @@ export function AIProvider({ children }) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [currentMode, setCurrentMode] = useState(null) // 'translate' | 'generate' | 'refine' | 'chat'
-  const [isStreaming, setIsStreaming] = useState(false)
+  const [isStreaming] = useState(false)
   const [currentModel, setCurrentModel] = useState(null)
   const [userPresets, setUserPresets] = useState({})
   const [isLoadingPresets, setIsLoadingPresets] = useState(false)

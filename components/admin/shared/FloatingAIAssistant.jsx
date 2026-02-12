@@ -92,6 +92,7 @@ export function FloatingAIAssistant() {
           break
         default:
           // Chat mode - simulate for now
+          result = { success: true }
           setTimeout(() => {
             addToHistory({ role: 'assistant', content: `Chat mode: ${inputValue}` })
           }, 1000)
@@ -113,7 +114,7 @@ export function FloatingAIAssistant() {
     }
   } catch (error) {
     addToHistory({ role: 'assistant', content: `Error: ${error.message}` })
-    }
+  }
   }
 
   const handleQuickAction = (mode) => {

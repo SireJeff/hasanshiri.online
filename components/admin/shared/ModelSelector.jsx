@@ -23,23 +23,9 @@ export function ModelSelector({
     if (!currentPreset || !presetConfig) return t('ai.selectModel')
 
     // Find preset by slug in config
-    const presetEntry = Object.entries(presetConfig || {}).find(([key, value]) => value.slug === currentPreset)
+    const presetEntry = Object.entries(presetConfig || {}).find(([, value]) => value.slug === currentPreset)
     return presetEntry?.[1]?.name || currentPreset
   }
-
-  // Get display name for a preset slug
-  const getPresetDisplayName = (slug) => {
-    const presetEntry = Object.entries(presetConfig || {}).find(([key, value]) => value.slug === slug)
-    return presetEntry?.[1]?.name || slug
-  }
-
-  // Get provider for a preset slug
-  const getPresetProvider = (slug) => {
-    const presetEntry = Object.entries(presetConfig || {}).find(([key, value]) => value.slug === slug)
-    return presetEntry?.[1]?.provider || ''
-  }
-
-  const currentPresetData = Object.values(presetConfig || {}).find(p => p.slug === currentPreset)
 
   return (
     <div className="relative">

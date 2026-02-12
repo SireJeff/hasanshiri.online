@@ -1,6 +1,6 @@
 'use client'
 
-import { Send, Languages } from 'lucide-react'
+import { Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 /**
@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next'
  * Quick action button for translating form fields
  */
 export function AITranslateButton({
-  field,
   sourceText,
   onTranslate,
   disabled = false,
