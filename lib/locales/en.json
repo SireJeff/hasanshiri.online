@@ -16,6 +16,13 @@
     "blog": "Blog",
     "contact": "Contact"
   },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "firstName": "Mohammad Hassan",
+    "lastName": "Shiri",
+    "description": "An inquisitive Physics undergraduate at Sharif University with a deep-seated passion for modeling complex systems and leveraging data to uncover foundational insights.",
+    "getInTouch": "Get In Touch"
+  },
   "ai": {
     "greeting": "Hi, I'm",
     "name": "Mohammad Hassan Shiri",
