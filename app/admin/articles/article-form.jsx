@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { createArticle, updateArticle, generateSlug } from '@/lib/actions/articles'
 import { ImageUpload } from '@/components/editor/ImageUpload'
-import { TranslateButton, FieldTranslateButton, TranslationResult } from '@/components/admin/shared/translate-button'
+import { BilingualAIField } from '@/components/admin/shared/BilingualAIField'
 import { Save, Eye, ArrowLeft, Loader2, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 
@@ -26,9 +26,6 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
   const [activeTab, setActiveTab] = useState('en')
   const [errors, setErrors] = useState({})
   const [translationErrors, setTranslationErrors] = useState([])
-
-  // Determine translation direction based on active tab
-  const translationDirection = activeTab === 'en' ? 'en2fa' : 'fa2en'
 
   // Form state
   const [formData, setFormData] = useState({
@@ -80,28 +77,6 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
     if (!formData.content_en.trim()) newErrors.content_en = 'English content is required'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }
-
-  const handleTranslationComplete = (translations, errors) => {
-    // Update form data with translations
-    for (const [field, value] of Object.entries(translations)) {
-      updateField(field, value)
-    }
-    if (errors && errors.length > 0) {
-      setTranslationErrors(errors)
-    } else {
-      setTranslationErrors([])
-    }
-  }
-
-  const handleFieldTranslation = (field, translated) => {
-    updateField(field, translated)
-    // Clear translation errors when successful
-    setTranslationErrors([])
-  }
-
-  const handleTranslationError = (error) => {
-    setErrors({ submit: `Translation failed: ${error}` })
   }
 
   const handleSubmit = async (status = null) => {
@@ -188,36 +163,8 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
             <Save className="w-4 h-4" />
             Publish
           </button>
-          {/* Translate All Button */}
-          <TranslateButton
-            data={formData}
-            direction={translationDirection}
-            fields={['title', 'excerpt', 'content']}
-            onTranslationComplete={handleTranslationComplete}
-            onError={handleTranslationError}
-            disabled={isPending}
-          />
-        </div>
-      </div>
-
-      {/* Translation Result Display */}
-      {translationErrors.length > 0 && (
-        <TranslationResult errors={translationErrors} />
-      )}
-
-      {errors.submit && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500">
-          {errors.submit}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6">
-        {/* Main Content */}
-        <div className="space-y-6">
-          {/* Language Tabs */}
-          <div className="flex gap-2 border-b border-border">
             <button
-              onClick={() => setActiveTab('en')}
+              onClick={() => handleSubmit('draft')}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'en'
                   ? 'border-primary text-primary'
@@ -241,78 +188,59 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
           {/* English Content */}
           {activeTab === 'en' && (
             <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-foreground">
-                    Title (English) *
-                  </label>
-                  <FieldTranslateButton
-                    text={formData.title_en}
-                    field="title_fa"
-                    direction="en2fa"
-                    onTranslationComplete={(translated) => handleFieldTranslation('title_fa', translated)}
-                    onError={handleTranslationError}
-                  />
-                </div>
-                <input
-                  type="text"
-                  value={formData.title_en}
-                  onChange={(e) => updateField('title_en', e.target.value)}
-                  className={`w-full px-4 py-2.5 bg-secondary border rounded-lg text-foreground placeholder-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none ${
-                    errors.title_en ? 'border-red-500' : 'border-border'
-                  }`}
-                  placeholder="Enter article title"
-                />
-                {errors.title_en && (
-                  <p className="mt-1 text-sm text-red-500">{errors.title_en}</p>
-                )}
-              </div>
+              {/* Title Field */}
+              <BilingualAIField
+                label="Title (English) *"
+                activeTab={activeTab}
+                nameEn="title_en"
+                nameFa="title_fa"
+                valueEn={formData.title_en}
+                valueFa={formData.title_fa}
+                onChangeEn={(val) => updateField('title_en', val)}
+                onChangeFa={(val) => updateField('title_fa', val)}
+                required={true}
+                enableTranslate={true}
+                enableRefine={true}
+              />
 
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-foreground">
-                    Excerpt (English)
-                  </label>
-                  <FieldTranslateButton
-                    text={formData.excerpt_en}
-                    field="excerpt_fa"
-                    direction="en2fa"
-                    onTranslationComplete={(translated) => handleFieldTranslation('excerpt_fa', translated)}
-                    onError={handleTranslationError}
-                  />
-                </div>
-                <textarea
-                  value={formData.excerpt_en}
-                  onChange={(e) => updateField('excerpt_en', e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-2.5 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none"
-                  placeholder="Brief description of the article"
-                />
-              </div>
+              {/* Excerpt Field */}
+              <BilingualAIField
+                label="Excerpt (English)"
+                activeTab={activeTab}
+                nameEn="excerpt_en"
+                nameFa="excerpt_fa"
+                valueEn={formData.excerpt_en}
+                valueFa={formData.excerpt_fa}
+                onChangeEn={(val) => updateField('excerpt_en', val)}
+                onChangeFa={(val) => updateField('excerpt_fa', val)}
+                type="textarea"
+                rows={2}
+                placeholderEn="Brief description of the article..."
+                placeholderFa="توضیح کوتاه درباره مقاله"
+                enableTranslate={true}
+                enableRefine={true}
+              />
 
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-foreground">
-                    Content (English) *
-                  </label>
-                  <FieldTranslateButton
-                    text={formData.content_en}
-                    field="content_fa"
-                    direction="en2fa"
-                    isHTML={true}
-                    onTranslationComplete={(translated) => handleFieldTranslation('content_fa', translated)}
-                    onError={handleTranslationError}
-                  />
-                </div>
-                <TipTapEditor
-                  content={formData.content_en}
-                  onChange={(html) => updateField('content_en', html)}
-                  placeholder="Start writing your article..."
-                />
-                {errors.content_en && (
-                  <p className="mt-1 text-sm text-red-500">{errors.content_en}</p>
-                )}
-              </div>
+              {/* Content Field */}
+              <BilingualAIField
+                label="Content (English) *"
+                activeTab={activeTab}
+                nameEn="content_en"
+                nameFa="content_fa"
+                valueEn={formData.content_en}
+                valueFa={formData.content_fa}
+                onChangeEn={(html) => updateField('content_en', html)}
+                onChangeFa={(html) => updateField('content_fa', html)}
+                type="textarea"
+                placeholderEn="Start writing your article..."
+                placeholderFa="نوشتن مقاله را شروع کنید..."
+                enableTranslate={true}
+                enableRefine={true}
+              />
+
+              {errors.content_en && (
+                <p className="mt-1 text-sm text-red-500">{errors.content_en}</p>
+              )}
             </div>
           )}
 
