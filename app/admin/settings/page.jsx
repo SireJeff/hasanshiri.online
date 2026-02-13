@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { User, Moon, Sun, Save, Loader2, HardDrive, Image as ImageIcon, Mail, Phone, MapPin, Github, Linkedin, Twitter, Youtube, Send, MessageCircle, Instagram, Anchor, ExternalLink } from 'lucide-react'
 import { getProfile, updateProfile, getStorageStats, getSiteSettings, updateSiteSettings } from '@/lib/actions/settings'
+import { useAI } from '@/components/admin/shared/AIContext'
 import { uploadImage } from '@/lib/actions/storage'
 import { useTheme } from '@/app/providers'
 import { cn } from '@/lib/utils'
@@ -184,6 +185,7 @@ export default function SettingsPage() {
     { id: 'contact', name: 'Contact', icon: Mail },
     { id: 'social', name: 'Social', icon: Anchor },
     { id: 'github', name: 'GitHub', icon: Github },
+    { id: 'ai', name: 'AI', icon: Sparkles },
   ]
 
   if (loading) {

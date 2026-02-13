@@ -2,24 +2,27 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Save, Loader2, Github as GithubIcon, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { createProject, updateProject, getProjectTags } from '@/lib/actions/projects'
-import { LanguageTabs, BilingualField } from '@/components/admin/shared/language-tabs'
+import { LanguageTabs } from '@/components/admin/shared/language-tabs'
+import { BilingualAIField } from '@/components/admin/shared/BilingualAIField'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
-import dynamic from 'next/dynamic'
+import { ArrowLeft, Save, Loader2, Github as GithubIcon, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 
-// Dynamic imports for components that shouldn't be SSR
-const TipTapEditor = dynamic(() => import('@/components/editor/TipTapEditor'), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-secondary/20 animate-pulse rounded-lg" />
-})
+// Dynamic import for TipTap to avoid SSR issues
+const TipTapEditor = dynamic(
+  () => import('@/components/editor/TipTapEditor').then(mod => mod.TipTapEditor),
+  {
+    ssr: false,
+    loading: () => <div className="border border-border rounded-lg bg-card animate-pulse min-h-[500px]" />,
+  }
+)
 
 export function ProjectForm({ tags, project, mode = 'create' }) {
   const router = useRouter()
   const { toast } = useToast()
-
   const [activeTab, setActiveTab] = useState('en')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState(null)
@@ -92,10 +95,7 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
     }
 
     try {
-      // Normalize the input - handle various formats:
-      // - https://github.com/username/repo
-      // - github.com/username/repo
-      // - username/repo
+      // Normalize input - handle various formats
       let normalizedRepo = repoName
 
       // Remove GitHub URL prefix if present
@@ -106,9 +106,6 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
 
       // Remove leading slash if present
       normalizedRepo = normalizedRepo.replace(/^\/+/, '')
-
-      // Remove trailing slash if present
-      normalizedRepo = normalizedRepo.replace(/\/+$/, '')
 
       // Remove .git suffix if present
       normalizedRepo = normalizedRepo.replace(/\.git$/, '')
@@ -141,11 +138,11 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
       // Auto-fill form fields
       setFormData(prev => ({
         ...prev,
-        github_repo_name: `${owner}/${repo}`, // Store normalized format
         title_en: repoData.name || prev.title_en,
+        title_fa: repoData.name || prev.title_fa,
         description_en: repoData.description || prev.description_en,
+        description_fa: repoData.description || prev.description_fa,
         github_url: repoData.html_url || prev.github_url,
-        demo_url: repoData.homepage || prev.demo_url,
       }))
 
       setMessage({
@@ -167,7 +164,6 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
       const submitData = {
         ...formData,
         tag_ids: selectedTagIds,
-        slug: formData.title_en.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-'),
       }
 
       if (mode === 'create') {
@@ -184,31 +180,57 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
 
       toast({
         title: mode === 'create' ? 'Project created' : 'Project updated',
-        description: mode === 'create'
-          ? 'Your new project has been added successfully.'
-          : 'The project has been updated successfully.',
+        description: mode === 'create' ? 'Your new project has been added successfully.' : 'The project has been updated successfully.',
       })
-
       router.push('/admin/projects')
       router.refresh()
     } catch (error) {
       console.error('Error saving project:', error)
-      setMessage({ type: 'error', text: error.message })
-    } finally {
-      setIsSubmitting(false)
+      toast({
+        title: 'Error',
+        description: mode === 'create' ? 'Failed to create project' : 'Failed to update project',
+      })
+    }
+  } finally {
+    setIsSubmitting(false)
     }
   }
 
   return (
     <div className="space-y-6">
-      {/* Back button */}
-      <Link
-        href="/admin/projects"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        <ArrowLeft size={16} />
-        Back to Projects
-      </Link>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/admin/projects"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={16} />
+            Back to Projects
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {project ? 'Edit Project' : 'New Project'}
+            </h1>
+            {project && (
+              <p className="text-sm text-muted-foreground">/{project.slug}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {isSubmitting ? (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-opacity disabled:opacity-50"
+            >
+              {isSubmitting && <Loader2 size={18} className="animate-spin" />}
+              {mode === 'create' ? 'Create Project' : 'Save Changes'}
+            </button>
+          ) : null}
+        </div>
+      </div>
 
       {/* Message */}
       {message && (
@@ -227,35 +249,37 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
         {/* Language Tabs */}
         <LanguageTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Title Fields */}
-        <BilingualField
+        {/* Project Title Fields */}
+        <BilingualAIField
           label="Project Title"
           activeTab={activeTab}
           nameEn="title_en"
           nameFa="title_fa"
           valueEn={formData.title_en}
           valueFa={formData.title_fa}
-          onChangeEn={(e) => setFormData(prev => ({ ...prev, title_en: e.target.value }))}
-          onChangeFa={(e) => setFormData(prev => ({ ...prev, title_fa: e.target.value }))}
-          placeholderEn="e.g., My Awesome Project"
-          placeholderFa="مثلاً: پروژه فوق‌العاده من"
-          required
+          onChangeEn={(val) => setFormData(prev => ({ ...prev, title_en: val }))}
+          onChangeFa={(val) => setFormData(prev => ({ ...prev, title_fa: val }))}
+          required={true}
+          enableTranslate={true}
+          enableRefine={false}
         />
 
         {/* Short Description Fields */}
-        <BilingualField
+        <BilingualAIField
           label="Short Description"
           activeTab={activeTab}
           nameEn="description_en"
           nameFa="description_fa"
           valueEn={formData.description_en}
           valueFa={formData.description_fa}
-          onChangeEn={(e) => setFormData(prev => ({ ...prev, description_en: e.target.value }))}
-          onChangeFa={(e) => setFormData(prev => ({ ...prev, description_fa: e.target.value }))}
+          onChangeEn={(val) => setFormData(prev => ({ ...prev, description_en: val }))}
+          onChangeFa={(val) => setFormData(prev => ({ ...prev, description_fa: val }))}
           type="textarea"
           rows={2}
           placeholderEn="Brief description for project cards..."
-          placeholderFa="توضیح کوت برای کارت پروژه..."
+          placeholderFa="توضیح کوتاه درباره پروژه..."
+          enableTranslate={true}
+          enableRefine={false}
         />
 
         {/* Long Description - TipTap Editor */}
@@ -266,7 +290,7 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
           <div className="min-h-[200px] border border-border rounded-lg overflow-hidden">
             <TipTapEditor
               content={formData[`long_description_${activeTab}`] || ''}
-              onChange={(content) => handleContentChange(activeTab, content)}
+              onChange={handleContentChange}
               editable={true}
               placeholder="Write detailed project description here..."
             />
@@ -275,6 +299,7 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
 
         {/* URLs Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Demo URL */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
               Demo URL
@@ -285,7 +310,7 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
                 name="demo_url"
                 value={formData.demo_url}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary pr-10"
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="https://..."
               />
               {formData.demo_url && (
@@ -301,197 +326,185 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
             </div>
           </div>
 
+          {/* GitHub URL */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
               GitHub URL
             </label>
-            <input
-              type="url"
-              name="github_url"
-              value={formData.github_url}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="https://github.com/..."
-            />
+            <div className="relative">
+              <input
+                type="url"
+                name="github_url"
+                value={formData.github_url}
+                onChange={handleChange}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="https://github.com/..."
+              />
+            </div>
           </div>
 
+          {/* Documentation URL */}
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
               Documentation URL
             </label>
-            <input
-              type="url"
-              name="docs_url"
-              value={formData.docs_url}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="https://..."
-            />
-          </div>
-        </div>
-
-        {/* GitHub Integration */}
-        <div className="border border-border rounded-lg p-4 space-y-4">
-          <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
-            <GithubIcon size={16} />
-            GitHub Integration
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Repository Name
-              </label>
+            <div className="relative">
               <input
-                type="text"
-                name="github_repo_name"
-                value={formData.github_repo_name}
+                type="url"
+                name="docs_url"
+                value={formData.docs_url}
                 onChange={handleChange}
                 className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="username/repo-name"
+                placeholder="https://..."
               />
+            </div>
+          </div>
+
+          {/* GitHub Integration */}
+          <div className="border border-border rounded-lg p-4 space-y-4">
+            <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+              <GithubIcon size={16} />
+              GitHub Integration
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Repository Name
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="github_repo_name"
+                    value={formData.github_repo_name}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="username/repo-name"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 mt-1">
+                  <button
+                    type="button"
+                    onClick={handleAutoFillGitHub}
+                    disabled={isSubmitting}
+                    className="px-4 py-2 bg-secondary hover:bg-secondary/80 rounded-lg transition-colors text-sm"
+                    title="Auto-fill from GitHub"
+                  >
+                    Fetch from GitHub
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="auto_sync"
+                    id="auto_sync"
+                    checked={formData.auto_sync}
+                    onChange={handleChange}
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
+                  />
+                  <span className="text-sm text-foreground">
+                    Enable daily auto-sync
+                  </span>
+                </label>
+              </div>
+
               <p className="text-xs text-muted-foreground mt-1">
-                Format: username/repository-name
+                When auto-sync is enabled, projects marked with "Enable daily auto-sync" will have their GitHub data (stars, forks, language) updated automatically via a scheduled cron job.
               </p>
             </div>
+          </div>
 
-            <div className="flex items-end">
-              <button
-                type="button"
-                onClick={handleAutoFillGitHub}
-                className="px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/70 transition-colors text-sm"
-              >
-                Auto-fill from GitHub
-              </button>
+          {/* Tags */}
+          <div className="border border-border rounded-lg p-4 space-y-4">
+            <h3 className="text-sm font-medium text-foreground">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {allTags.map((tag) => (
+                <button
+                  key={tag.id}
+                  type="button"
+                  onClick={() => toggleTag(tag.id)}
+                  className={cn(
+                    "px-2.5 py-1 text-xs rounded-full transition-colors",
+                    selectedTagIds.includes(tag.id)
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-muted-foreground hover:text-foreground"
+                  )}
+                  >
+                  {tag.name_en}
+                </button>
+              ))}
+              {allTags.length === 0 && (
+                <p className="text-sm text-muted-foreground">No tags available</p>
+              )}
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              name="auto_sync"
-              id="auto_sync"
-              checked={formData.auto_sync}
-              onChange={handleChange}
-              className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
-            />
-            <label htmlFor="auto_sync" className="text-sm text-foreground">
-              Enable daily auto-sync
-            </label>
-          </div>
-        </div>
+          {/* Status and Featured */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm text-muted-foreground mb-1.5">
+                Status
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-sm bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="">Select status</option>
+                  <option value="active">Active</option>
+                  <option value="draft">Draft</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
 
-        {/* Featured Image */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Featured Image
-          </label>
-          <input
-            type="text"
-            name="featured_image"
-            value={formData.featured_image}
-            onChange={handleChange}
-            className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="/projects/my-project.png"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Path to project image (upload via Media Library)
-          </p>
-        </div>
+            <div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="is_featured"
+                  id="is_featured"
+                  checked={formData.is_featured}
+                  onChange={handleChange}
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
+                  />
+                  <span className="text-sm text-foreground">
+                    Featured project
+                  </span>
+                </label>
+              </div>
 
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
-            Tags
-          </label>
-          <div className="flex flex-wrap gap-2 p-3 bg-secondary/20 rounded-lg min-h-[60px]">
-            {allTags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => toggleTag(tag.id)}
-                className={cn(
-                  "px-3 py-1 text-sm rounded-full transition-colors",
-                  selectedTagIds.includes(tag.id)
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
-                )}
+            <div>
+              <label className="block text-sm text-muted-foreground mb-1.5">
+                Display Order
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  name="sort_order"
+                  value={formData.sort_order}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-4 pt-4 border-t border-border">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-opacity disabled:opacity-50"
               >
-                {tag.name_en}
-              </button>
-            ))}
+              {isSubmitting && <Loader2 size={18} className="animate-spin" />}
+              {mode === 'create' ? 'Create Project' : 'Save Changes'}
+            </button>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {selectedTagIds.length} tag{selectedTagIds.length !== 1 ? 's' : ''} selected
-          </p>
-        </div>
-
-        {/* Status and Featured */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="active">Active</option>
-              <option value="draft">Draft</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              name="is_featured"
-              id="is_featured"
-              checked={formData.is_featured}
-              onChange={handleChange}
-              className="w-4 h-4 rounded border-border text-primary focus:ring-2 focus:ring-primary"
-            />
-            <label htmlFor="is_featured" className="text-sm text-foreground">
-              Featured project
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              Display Order
-            </label>
-            <input
-              type="number"
-              name="sort_order"
-              value={formData.sort_order}
-              onChange={handleChange}
-              min="0"
-              className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-4 pt-4 border-t border-border">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save size={18} />
-                {mode === 'create' ? 'Create Project' : 'Save Changes'}
-              </>
-            )}
-          </button>
         </div>
       </form>
     </div>
