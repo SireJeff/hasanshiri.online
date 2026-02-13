@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 import { getUserPresets as fetchUserPresetsServer, updateUserPresets as saveUserPresetsServer } from '@/lib/actions/ai'
-import { createClient } from '@/lib/supabase/server'
 
 /**
  * AI Context for managing floating assistant state
@@ -24,12 +23,11 @@ export function AIProvider({ children }) {
     const loadPresets = async () => {
       setIsLoadingPresets(true)
       try {
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (user) {
-          const presets = await fetchUserPresetsServer(user.id)
-          setUserPresets(presets)
+        const result = await fetchUserPresetsServer()
+        if (result.success) {
+          setUserPresets(result.presets || {})
+        } else if (result.error) {
+          console.error('Failed to load user presets:', result.error)
         }
       } catch (error) {
         console.error('Failed to load user presets:', error)
@@ -72,16 +70,11 @@ export function AIProvider({ children }) {
     fetchUserPresets: async () => {
       setIsLoadingPresets(true)
       try {
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-
-        if (!user) {
-          return { error: 'Authentication required', success: false }
+        const result = await fetchUserPresetsServer()
+        if (result.success) {
+          setUserPresets(result.presets || {})
         }
-
-        const presets = await fetchUserPresetsServer(user.id)
-        setUserPresets(presets)
-        return { success: true, presets }
+        return result
       } catch (error) {
         console.error('Failed to fetch user presets:', error)
         return { error: error.message, success: false }

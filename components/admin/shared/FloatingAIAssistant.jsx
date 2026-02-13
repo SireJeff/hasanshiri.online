@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Minimize2, Maximize2, X, Send, Sparkles, Languages, RotateCw, Trash2, Settings } from 'lucide-react'
+import { Minimize2, X, Send, Sparkles, Languages, RotateCw, Trash2, Settings } from 'lucide-react'
 import { useAI } from '@/components/admin/shared/AIContext'
 import { useTranslation } from 'react-i18next'
 import { aiTranslate, aiGenerateContent, aiRefineContent } from '@/lib/actions/ai'
@@ -62,11 +62,13 @@ export function FloatingAIAssistant() {
     addToHistory({ role: 'user', content: inputValue })
     setInputValue('')
 
-    // Call appropriate server action based on current mode
-    let result
     try {
+      let result
+      let responseContent = ''
+
+      // Call appropriate server action based on current mode
       switch (currentMode) {
-        case 'translate':
+        case 'translate': {
           result = await aiTranslate({
             direction: 'en2fa',
             title: inputValue,
@@ -74,48 +76,55 @@ export function FloatingAIAssistant() {
             content: inputValue,
             model: userPresets.translateFast,
           })
+          if (result.error) {
+            responseContent = `Error: ${result.error}`
+          } else {
+            responseContent = `Translation:\n${JSON.stringify(result.translated || {}, null, 2)}`
+          }
           break
-        case 'generate':
+        }
+        case 'generate': {
           result = await aiGenerateContent({
             topic: inputValue,
             targetLang: 'en',
             tone: 'professional',
             model: userPresets.generate,
           })
+          if (result.error) {
+            responseContent = `Error: ${result.error}`
+          } else {
+            responseContent = `Generated:\n${JSON.stringify(result, null, 2)}`
+          }
           break
-        case 'refine':
+        }
+        case 'refine': {
           result = await aiRefineContent({
             content: inputValue,
             instructions: 'Improve clarity, grammar, and readability.',
             model: userPresets.refine,
           })
+          if (result.error) {
+            responseContent = `Error: ${result.error}`
+          } else {
+            responseContent = `Refined:\n${result.refined || ''}`
+          }
           break
+        }
         default:
           // Chat mode - simulate for now
-          result = { success: true }
           setTimeout(() => {
             addToHistory({ role: 'assistant', content: `Chat mode: ${inputValue}` })
           }, 1000)
           return
       }
 
-      if (result.error) {
-        addToHistory({ role: 'assistant', content: `Error: ${result.error}` })
-      } else if (currentMode !== 'chat') {
-        // Format success response based on mode
-        if (currentMode === 'translate') {
-          addToHistory({ role: 'assistant', content: `Translation:\n${JSON.stringify(result.translated || {}, null, 2)}` })
-        } else if (currentMode === 'generate') {
-          addToHistory({ role: 'assistant', content: `Generated:\n${JSON.stringify(result, null, 2)}` })
-        } else if (currentMode === 'refine') {
-          addToHistory({ role: 'assistant', content: `Refined:\n${result.refined || ''}` })
-          }
-        }
+      // Add response to history
+      if (responseContent) {
+        addToHistory({ role: 'assistant', content: responseContent })
       }
+    } catch (error) {
+      addToHistory({ role: 'assistant', content: `Error: ${error.message}` })
     }
-  } catch (error) {
-    addToHistory({ role: 'assistant', content: `Error: ${error.message}` })
-  }
   }
 
   const handleQuickAction = (mode) => {
