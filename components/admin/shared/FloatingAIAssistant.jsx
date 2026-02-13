@@ -109,6 +109,7 @@ export function FloatingAIAssistant() {
           addToHistory({ role: 'assistant', content: `Generated:\n${JSON.stringify(result, null, 2)}` })
         } else if (currentMode === 'refine') {
           addToHistory({ role: 'assistant', content: `Refined:\n${result.refined || ''}` })
+          }
         }
       }
     }
