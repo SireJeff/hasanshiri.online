@@ -8,12 +8,14 @@ import { LanguageTabs } from '@/components/admin/shared/language-tabs'
 import { BilingualAIField } from '@/components/admin/shared/BilingualAIField'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
-import { ArrowLeft, Save, Loader2, Github as GithubIcon, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Loader2, Github as GithubIcon, ExternalLink, Sparkles, Languages } from 'lucide-react'
 import Link from 'next/link'
+import { AIGenerateModal } from '@/components/admin/shared/AIGenerateModal'
+import { aiGenerateProject, aiTranslateAll } from '@/lib/actions/ai'
 
 // Dynamic import for TipTap to avoid SSR issues
 const TipTapEditor = dynamic(
-  () => import('@/components/editor/TipTapEditor').then(mod => mod.TipTapEditor),
+  () => import('@/components/editor/TipTapEditor'),
   {
     ssr: false,
     loading: () => <div className="border border-border rounded-lg bg-card animate-pulse min-h-[500px]" />,
@@ -26,6 +28,8 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
   const [activeTab, setActiveTab] = useState('en')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState(null)
+  const [showGenerateModal, setShowGenerateModal] = useState(false)
+  const [isTranslatingAll, setIsTranslatingAll] = useState(false)
 
   // Tag management state
   const [allTags, setAllTags] = useState(tags || [])
@@ -155,6 +159,45 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
     }
   }
 
+  const handleGenerateProject = async (description) => {
+    const result = await aiGenerateProject({ description })
+    if (result.error) throw new Error(result.error)
+    setFormData(prev => ({
+      ...prev,
+      title_en: result.title_en || prev.title_en,
+      description_en: result.description_en || prev.description_en,
+      long_description_en: result.long_description_en || prev.long_description_en,
+    }))
+  }
+
+  const handleTranslateAll = async () => {
+    setIsTranslatingAll(true)
+    try {
+      // Dynamic direction based on active tab
+      const direction = activeTab === 'en' ? 'en2fa' : 'fa2en'
+      const sourceSuffix = activeTab === 'en' ? '_en' : '_fa'
+      const targetSuffix = activeTab === 'en' ? '_fa' : '_en'
+
+      const result = await aiTranslateAll({
+        fields: {
+          [`title${sourceSuffix}`]: formData[`title${sourceSuffix}`],
+          [`description${sourceSuffix}`]: formData[`description${sourceSuffix}`],
+          [`content${sourceSuffix}`]: formData[`long_description${sourceSuffix}`],
+        },
+        direction,
+      })
+      if (result.error) throw new Error(result.error)
+      setFormData(prev => ({
+        ...prev,
+        [`title${targetSuffix}`]: result.translated?.[`title${targetSuffix}`] || prev[`title${targetSuffix}`],
+        [`description${targetSuffix}`]: result.translated?.[`description${targetSuffix}`] || prev[`description${targetSuffix}`],
+        [`long_description${targetSuffix}`]: result.translated?.[`content${targetSuffix}`] || prev[`long_description${targetSuffix}`],
+      }))
+    } finally {
+      setIsTranslatingAll(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -190,9 +233,8 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
         title: 'Error',
         description: mode === 'create' ? 'Failed to create project' : 'Failed to update project',
       })
-    }
-  } finally {
-    setIsSubmitting(false)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -219,6 +261,23 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowGenerateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <Sparkles className="w-4 h-4" />
+            Generate
+          </button>
+          <button
+            type="button"
+            onClick={handleTranslateAll}
+            disabled={isTranslatingAll || (!formData.title_en && !formData.description_en && !formData.long_description_en && !formData.title_fa && !formData.description_fa && !formData.long_description_fa)}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors disabled:opacity-50"
+          >
+            {isTranslatingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
+            Translate All
+          </button>
           {isSubmitting ? (
             <button
               type="submit"
@@ -493,6 +552,7 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
                 />
               </div>
             </div>
+          </div>
 
           {/* Actions */}
           <div className="flex items-center gap-4 pt-4 border-t border-border">
@@ -507,6 +567,22 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
           </div>
         </div>
       </form>
+
+      <AIGenerateModal
+        isOpen={showGenerateModal}
+        onClose={() => setShowGenerateModal(false)}
+        onGenerate={handleGenerateProject}
+        onTranslateAll={handleTranslateAll}
+        title="Generate Project"
+        placeholder="Describe your project (e.g., 'E-commerce platform with React and Node.js')"
+        label="Project Description"
+        showTranslateAll={true}
+        hasContent={{
+          title: !!(formData.title_en || formData.title_fa),
+          excerpt: !!(formData.description_en || formData.description_fa),
+          content: !!(formData.long_description_en || formData.long_description_fa),
+        }}
+      />
     </div>
   )
 }
