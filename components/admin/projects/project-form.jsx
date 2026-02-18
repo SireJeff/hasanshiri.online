@@ -160,14 +160,36 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
   }
 
   const handleGenerateProject = async (description) => {
-    const result = await aiGenerateProject({ description })
-    if (result.error) throw new Error(result.error)
-    setFormData(prev => ({
-      ...prev,
-      title_en: result.title_en || prev.title_en,
-      description_en: result.description_en || prev.description_en,
-      long_description_en: result.long_description_en || prev.long_description_en,
-    }))
+    try {
+      const result = await aiGenerateProject({ description })
+      if (result.error) {
+        toast({
+          title: 'Generation Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
+        throw new Error(result.error)
+      }
+      setFormData(prev => ({
+        ...prev,
+        title_en: result.title_en || prev.title_en,
+        description_en: result.description_en || prev.description_en,
+        long_description_en: result.long_description_en || prev.long_description_en,
+      }))
+      toast({
+        title: 'Project Generated',
+        description: 'The project content has been generated successfully.',
+      })
+    } catch (error) {
+      if (!error.message?.includes('Generation Failed')) {
+        toast({
+          title: 'Generation Failed',
+          description: error.message || 'An unexpected error occurred',
+          variant: 'destructive',
+        })
+      }
+      throw error
+    }
   }
 
   const handleTranslateAll = async () => {
@@ -186,13 +208,32 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
         },
         direction,
       })
-      if (result.error) throw new Error(result.error)
+      if (result.error) {
+        toast({
+          title: 'Translation Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
+        throw new Error(result.error)
+      }
       setFormData(prev => ({
         ...prev,
         [`title${targetSuffix}`]: result.translated?.[`title${targetSuffix}`] || prev[`title${targetSuffix}`],
         [`description${targetSuffix}`]: result.translated?.[`description${targetSuffix}`] || prev[`description${targetSuffix}`],
         [`long_description${targetSuffix}`]: result.translated?.[`content${targetSuffix}`] || prev[`long_description${targetSuffix}`],
       }))
+      toast({
+        title: 'Translation Complete',
+        description: `All fields have been translated to ${activeTab === 'en' ? 'Persian' : 'English'}.`,
+      })
+    } catch (error) {
+      if (!error.message?.includes('Translation Failed')) {
+        toast({
+          title: 'Translation Failed',
+          description: error.message || 'An unexpected error occurred',
+          variant: 'destructive',
+        })
+      }
     } finally {
       setIsTranslatingAll(false)
     }

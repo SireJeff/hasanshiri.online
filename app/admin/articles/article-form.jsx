@@ -6,12 +6,16 @@ import dynamic from 'next/dynamic'
 import { createArticle, updateArticle, generateSlug } from '@/lib/actions/articles'
 import { ImageUpload } from '@/components/editor/ImageUpload'
 import { BilingualAIField } from '@/components/admin/shared/BilingualAIField'
-import { Save, Eye, ArrowLeft, Loader2, RefreshCw } from 'lucide-react'
+import { LanguageTabs } from '@/components/admin/shared/language-tabs'
+import { Save, Eye, ArrowLeft, Loader2, RefreshCw, Sparkles, Languages } from 'lucide-react'
+import { AIGenerateModal } from '@/components/admin/shared/AIGenerateModal'
+import { aiGenerateArticle, aiTranslateAll } from '@/lib/actions/ai'
+import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 
 // Dynamic import for TipTap to avoid SSR issues
 const TipTapEditor = dynamic(
-  () => import('@/components/editor/TipTapEditor').then(mod => mod.TipTapEditor),
+  () => import('@/components/editor/TipTapEditor'),
   {
     ssr: false,
     loading: () => (
@@ -22,10 +26,12 @@ const TipTapEditor = dynamic(
 
 export function ArticleForm({ article = null, categories = [], tags = [] }) {
   const router = useRouter()
+  const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState('en')
   const [errors, setErrors] = useState({})
-  const [translationErrors, setTranslationErrors] = useState([])
+  const [showGenerateModal, setShowGenerateModal] = useState(false)
+  const [isTranslatingAll, setIsTranslatingAll] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -60,6 +66,97 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
     if (!formData.title_en) return
     const slug = await generateSlug(formData.title_en)
     updateField('slug', slug)
+  }
+
+  const handleGenerateArticle = async (topic) => {
+    try {
+      const result = await aiGenerateArticle({ topic })
+      if (result.error) {
+        toast({
+          title: 'Generation Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
+        throw new Error(result.error)
+      }
+      setFormData(prev => ({
+        ...prev,
+        title_en: result.title_en || prev.title_en,
+        excerpt_en: result.excerpt_en || prev.excerpt_en,
+        content_en: result.content_en || prev.content_en,
+        slug: result.slug || prev.slug,
+        meta_title_en: result.meta_title_en || prev.meta_title_en,
+        meta_description_en: result.meta_description_en || prev.meta_description_en,
+      }))
+      toast({
+        title: 'Article Generated',
+        description: 'The article content has been generated successfully.',
+      })
+    } catch (error) {
+      if (!error.message?.includes('Generation Failed')) {
+        toast({
+          title: 'Generation Failed',
+          description: error.message || 'An unexpected error occurred',
+          variant: 'destructive',
+        })
+      }
+      throw error
+    }
+  }
+
+  const handleTranslateAll = async () => {
+    setIsTranslatingAll(true)
+    try {
+      // Dynamic direction based on active tab
+      const direction = activeTab === 'en' ? 'en2fa' : 'fa2en'
+      const sourceSuffix = activeTab === 'en' ? '_en' : '_fa'
+
+      const result = await aiTranslateAll({
+        fields: {
+          [`title${sourceSuffix}`]: formData[`title${sourceSuffix}`],
+          [`excerpt${sourceSuffix}`]: formData[`excerpt${sourceSuffix}`],
+          [`content${sourceSuffix}`]: formData[`content${sourceSuffix}`],
+          [`meta_title${sourceSuffix}`]: formData[`meta_title${sourceSuffix}`],
+          [`meta_description${sourceSuffix}`]: formData[`meta_description${sourceSuffix}`],
+        },
+        direction,
+      })
+      if (result.error) {
+        toast({
+          title: 'Translation Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
+        throw new Error(result.error)
+      }
+
+      // Target suffix is opposite of source
+      const targetSuffix = activeTab === 'en' ? '_fa' : '_en'
+
+      setFormData(prev => ({
+        ...prev,
+        [`title${targetSuffix}`]: result.translated?.[`title${targetSuffix}`] || prev[`title${targetSuffix}`],
+        [`excerpt${targetSuffix}`]: result.translated?.[`excerpt${targetSuffix}`] || prev[`excerpt${targetSuffix}`],
+        [`content${targetSuffix}`]: result.translated?.[`content${targetSuffix}`] || prev[`content${targetSuffix}`],
+        [`meta_title${targetSuffix}`]: result.translated?.[`meta_title${targetSuffix}`] || prev[`meta_title${targetSuffix}`],
+        [`meta_description${targetSuffix}`]: result.translated?.[`meta_description${targetSuffix}`] || prev[`meta_description${targetSuffix}`],
+      }))
+
+      toast({
+        title: 'Translation Complete',
+        description: `All fields have been translated to ${activeTab === 'en' ? 'Persian' : 'English'}.`,
+      })
+    } catch (error) {
+      if (!error.message?.includes('Translation Failed')) {
+        toast({
+          title: 'Translation Failed',
+          description: error.message || 'An unexpected error occurred',
+          variant: 'destructive',
+        })
+      }
+    } finally {
+      setIsTranslatingAll(false)
+    }
   }
 
   const handleTagToggle = (tagId) => {
@@ -126,6 +223,23 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowGenerateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <Sparkles className="w-4 h-4" />
+            Generate
+          </button>
+          <button
+            type="button"
+            onClick={handleTranslateAll}
+            disabled={isTranslatingAll || (!formData.title_en && !formData.excerpt_en && !formData.content_en && !formData.title_fa && !formData.excerpt_fa && !formData.content_fa)}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors disabled:opacity-50"
+          >
+            {isTranslatingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Languages className="w-4 h-4" />}
+            Translate All
+          </button>
           {article && (
             <Link
               href={`/admin/articles/${article.id}/preview`}
@@ -157,167 +271,71 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
           <button
             onClick={() => handleSubmit('published')}
             disabled={isPending}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-opacity disabled:opacity-50"
           >
             {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             <Save className="w-4 h-4" />
             Publish
           </button>
-            <button
-              onClick={() => handleSubmit('draft')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'en'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              English
-            </button>
-            <button
-              onClick={() => setActiveTab('fa')}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === 'fa'
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              فارسی (Persian)
-            </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Language Tabs */}
+          <LanguageTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {/* Title Fields */}
+          <BilingualAIField
+            label="Title"
+            activeTab={activeTab}
+            nameEn="title_en"
+            nameFa="title_fa"
+            valueEn={formData.title_en}
+            valueFa={formData.title_fa}
+            onChangeEn={(val) => updateField('title_en', val)}
+            onChangeFa={(val) => updateField('title_fa', val)}
+            required={true}
+            enableTranslate={true}
+            enableRefine={true}
+          />
+
+          {/* Excerpt Fields */}
+          <BilingualAIField
+            label="Short Description"
+            activeTab={activeTab}
+            nameEn="excerpt_en"
+            nameFa="excerpt_fa"
+            valueEn={formData.excerpt_en}
+            valueFa={formData.excerpt_fa}
+            onChangeEn={(val) => updateField('excerpt_en', val)}
+            onChangeFa={(val) => updateField('excerpt_fa', val)}
+            type="textarea"
+            rows={2}
+            placeholderEn="Brief description of the article..."
+            placeholderFa="توضیح کوتاه درباره مقاله"
+            enableTranslate={true}
+            enableRefine={true}
+          />
+
+          {/* Content - TipTap Editor */}
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Content ({activeTab === 'en' ? 'English' : 'فارسی'})
+            </label>
+            <div className="min-h-[200px] border border-border rounded-lg overflow-hidden">
+              <TipTapEditor
+                content={formData[`content_${activeTab}`] || ''}
+                onChange={(html) => updateField(`content_${activeTab}`, html)}
+                editable={true}
+                placeholder={activeTab === 'en' ? 'Start writing your article...' : 'نوشتن مقاله را شروع کنید...'}
+              />
+            </div>
+            {errors.content_en && (
+              <p className="mt-1 text-sm text-red-500">{errors.content_en}</p>
+            )}
           </div>
-
-          {/* English Content */}
-          {activeTab === 'en' && (
-            <div className="space-y-4">
-              {/* Title Field */}
-              <BilingualAIField
-                label="Title (English) *"
-                activeTab={activeTab}
-                nameEn="title_en"
-                nameFa="title_fa"
-                valueEn={formData.title_en}
-                valueFa={formData.title_fa}
-                onChangeEn={(val) => updateField('title_en', val)}
-                onChangeFa={(val) => updateField('title_fa', val)}
-                required={true}
-                enableTranslate={true}
-                enableRefine={true}
-              />
-
-              {/* Excerpt Field */}
-              <BilingualAIField
-                label="Excerpt (English)"
-                activeTab={activeTab}
-                nameEn="excerpt_en"
-                nameFa="excerpt_fa"
-                valueEn={formData.excerpt_en}
-                valueFa={formData.excerpt_fa}
-                onChangeEn={(val) => updateField('excerpt_en', val)}
-                onChangeFa={(val) => updateField('excerpt_fa', val)}
-                type="textarea"
-                rows={2}
-                placeholderEn="Brief description of the article..."
-                placeholderFa="توضیح کوتاه درباره مقاله"
-                enableTranslate={true}
-                enableRefine={true}
-              />
-
-              {/* Content Field */}
-              <BilingualAIField
-                label="Content (English) *"
-                activeTab={activeTab}
-                nameEn="content_en"
-                nameFa="content_fa"
-                valueEn={formData.content_en}
-                valueFa={formData.content_fa}
-                onChangeEn={(html) => updateField('content_en', html)}
-                onChangeFa={(html) => updateField('content_fa', html)}
-                type="textarea"
-                placeholderEn="Start writing your article..."
-                placeholderFa="نوشتن مقاله را شروع کنید..."
-                enableTranslate={true}
-                enableRefine={true}
-              />
-
-              {errors.content_en && (
-                <p className="mt-1 text-sm text-red-500">{errors.content_en}</p>
-              )}
-            </div>
-          )}
-
-          {/* Persian Content */}
-          {activeTab === 'fa' && (
-            <div className="space-y-4" dir="rtl">
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-foreground">
-                    عنوان (فارسی) *
-                  </label>
-                  <FieldTranslateButton
-                    text={formData.title_fa}
-                    field="title_en"
-                    direction="fa2en"
-                    onTranslationComplete={(translated) => handleFieldTranslation('title_en', translated)}
-                    onError={handleTranslationError}
-                  />
-                </div>
-                <input
-                  type="text"
-                  value={formData.title_fa}
-                  onChange={(e) => updateField('title_fa', e.target.value)}
-                  className={`w-full px-4 py-2.5 bg-secondary border rounded-lg text-foreground placeholder-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none ${
-                    errors.title_fa ? 'border-red-500' : 'border-border'
-                  }`}
-                  placeholder="عنوان مقاله را وارد کنید"
-                />
-                {errors.title_fa && (
-                  <p className="mt-1 text-sm text-red-500">{errors.title_fa}</p>
-                )}
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-foreground">
-                    خلاصه (فارسی)
-                  </label>
-                  <FieldTranslateButton
-                    text={formData.excerpt_fa}
-                    field="excerpt_en"
-                    direction="fa2en"
-                    onTranslationComplete={(translated) => handleFieldTranslation('excerpt_en', translated)}
-                    onError={handleTranslationError}
-                  />
-                </div>
-                <textarea
-                  value={formData.excerpt_fa}
-                  onChange={(e) => updateField('excerpt_fa', e.target.value)}
-                  rows={2}
-                  className="w-full px-4 py-2.5 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none"
-                  placeholder="توضیح کوتاه درباره مقاله"
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-foreground">
-                    محتوا (فارسی)
-                  </label>
-                  <FieldTranslateButton
-                    text={formData.content_fa}
-                    field="content_en"
-                    direction="fa2en"
-                    isHTML={true}
-                    onTranslationComplete={(translated) => handleFieldTranslation('content_en', translated)}
-                    onError={handleTranslationError}
-                  />
-                </div>
-                <TipTapEditor
-                  content={formData.content_fa}
-                  onChange={(html) => updateField('content_fa', html)}
-                  placeholder="نوشتن مقاله را شروع کنید..."
-                />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Sidebar */}
@@ -473,6 +491,22 @@ export function ArticleForm({ article = null, categories = [], tags = [] }) {
           </div>
         </div>
       </div>
+
+      <AIGenerateModal
+        isOpen={showGenerateModal}
+        onClose={() => setShowGenerateModal(false)}
+        onGenerate={handleGenerateArticle}
+        onTranslateAll={handleTranslateAll}
+        title="Generate Article"
+        placeholder="Enter a topic for your article (e.g., 'How to build a REST API with Node.js')"
+        label="Article Topic"
+        showTranslateAll={true}
+        hasContent={{
+          title: !!(formData.title_en || formData.title_fa),
+          excerpt: !!(formData.excerpt_en || formData.excerpt_fa),
+          content: !!(formData.content_en || formData.content_fa),
+        }}
+      />
     </div>
   )
 }
