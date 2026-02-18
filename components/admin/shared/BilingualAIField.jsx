@@ -1,12 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Languages, Sparkles, RotateCw, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { BilingualField } from '@/components/admin/shared/language-tabs'
-import { AITranslateButton, AIGenerateButton, AIRefineButton } from '@/components/admin/shared'
+import { AITranslateButton } from '@/components/admin/shared/AITranslateButton'
+import { AIGenerateButton } from '@/components/admin/shared/AIGenerateButton'
+import { AIRefineButton } from '@/components/admin/shared/AIRefineButton'
 import { aiTranslate, aiGenerateContent, aiRefineContent } from '@/lib/actions/ai'
-import { useAI } from '@/components/admin/shared/AIContext'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/hooks/use-toast'
 
 /**
  * BilingualAIField Component
@@ -40,7 +43,8 @@ export function BilingualAIField({
   enableRefine = false,
   className = '',
 }) {
-  const { t } = useAI()
+  const { t } = useTranslation()
+  const { toast } = useToast()
   const [translateLoading, setTranslateLoading] = useState(false)
   const [generateLoading, setGenerateLoading] = useState(false)
   const [refineLoading, setRefineLoading] = useState(false)
@@ -52,28 +56,6 @@ export function BilingualAIField({
   // Determine translation direction based on active tab
   const translateDirection = activeTab === 'en' ? 'en2fa' : 'fa2en'
   const targetFieldName = activeTab === 'en' ? nameFa : nameEn
-
-  // Determine preset based on action type
-  const getTranslatePreset = () => {
-    // For faster translation, use the faster preset
-    return '@preset/translate-fast'
-  }
-
-  const getGeneratePreset = () => {
-    // For article content generation
-    if (nameEn.includes('title') || nameEn.includes('excerpt') || nameEn.includes('content')) {
-      return '@preset/article-generator'
-    }
-    // For project descriptions
-    if (nameEn.includes('description')) {
-      return '@preset/project-generator'
-    }
-    return '@preset/article-generator'
-  }
-
-  const getRefinePreset = () => {
-    return '@preset/content-refiner'
-  }
 
   /**
    * Handle AI translation
@@ -92,7 +74,11 @@ export function BilingualAIField({
       })
 
       if (result.error) {
-        console.error('Translation failed:', result.error)
+        toast({
+          title: t('ai.translation_failed') || 'Translation Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
       } else if (result.translated && result.translated[targetFieldName]) {
         // Update the target field with translated value
         if (activeTab === 'en') {
@@ -100,9 +86,17 @@ export function BilingualAIField({
         } else {
           onChangeEn(result.translated[targetFieldName])
         }
+        toast({
+          title: t('ai.translation_complete') || 'Translation Complete',
+          description: t('ai.field_translated') || 'Field translated successfully',
+        })
       }
     } catch (error) {
-      console.error('Translation error:', error)
+      toast({
+        title: t('ai.translation_failed') || 'Translation Failed',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      })
     } finally {
       setTranslateLoading(false)
     }
@@ -131,7 +125,11 @@ export function BilingualAIField({
       })
 
       if (result.error) {
-        console.error('Generation failed:', result.error)
+        toast({
+          title: t('ai.generation_failed') || 'Generation Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
       } else {
         // Update both languages with generated content
         const fieldNameEn = nameEn
@@ -143,9 +141,17 @@ export function BilingualAIField({
         if (result[fieldNameFa]) {
           onChangeFa(result[fieldNameFa])
         }
+        toast({
+          title: t('ai.generation_complete') || 'Generation Complete',
+          description: t('ai.content_generated') || 'Content generated successfully',
+        })
       }
     } catch (error) {
-      console.error('Generation error:', error)
+      toast({
+        title: t('ai.generation_failed') || 'Generation Failed',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      })
     } finally {
       setGenerateLoading(false)
     }
@@ -172,7 +178,11 @@ export function BilingualAIField({
       })
 
       if (result.error) {
-        console.error('Refinement failed:', result.error)
+        toast({
+          title: t('ai.refinement_failed') || 'Refinement Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
       } else if (result.refined) {
         // Update the active field with refined content
         if (activeTab === 'en') {
@@ -180,9 +190,17 @@ export function BilingualAIField({
         } else {
           onChangeFa(result.refined)
         }
+        toast({
+          title: t('ai.refinement_complete') || 'Refinement Complete',
+          description: t('ai.content_refined') || 'Content refined successfully',
+        })
       }
     } catch (error) {
-      console.error('Refinement error:', error)
+      toast({
+        title: t('ai.refinement_failed') || 'Refinement Failed',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      })
     } finally {
       setRefineLoading(false)
     }
