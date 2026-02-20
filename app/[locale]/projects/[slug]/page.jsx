@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { getProjectBySlug } from '@/lib/actions/projects'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import { ArrowLeft, Calendar, ExternalLink, Github, Tag, Home } from 'lucide-react'
-import { i18nConfig, generateAlternateUrls } from '@/lib/i18n-config'
+import { generateAlternateUrls } from '@/lib/i18n-config'
 
 // Force dynamic rendering to avoid cookies() error in generateStaticParams
 export const dynamic = 'force-dynamic'
@@ -86,8 +86,6 @@ export default async function ProjectPage({ params }) {
         { year: 'numeric', month: 'long', day: 'numeric' }
       )
     : null
-
-  const projectUrl = `https://hasanshiri.online/${locale}/projects/${project.slug}`
 
   // Breadcrumb items
   const breadcrumbItems = [

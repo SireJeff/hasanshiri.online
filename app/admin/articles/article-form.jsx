@@ -7,7 +7,7 @@ import { createArticle, updateArticle, generateSlug } from '@/lib/actions/articl
 import { ImageUpload } from '@/components/editor/ImageUpload'
 import { BilingualAIField } from '@/components/admin/shared/BilingualAIField'
 import { LanguageTabs } from '@/components/admin/shared/language-tabs'
-import { Save, Eye, ArrowLeft, Loader2, RefreshCw, Sparkles, Languages, Search } from 'lucide-react'
+import { Save, Eye, ArrowLeft, Loader2, RefreshCw, Sparkles, Languages } from 'lucide-react'
 import { AIGenerateModal } from '@/components/admin/shared/AIGenerateModal'
 import { AISeoButton } from '@/components/admin/shared/AISeoButton'
 import { aiGenerateArticle, aiTranslateAll, aiGenerateSEO } from '@/lib/actions/ai'

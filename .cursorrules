@@ -1,0 +1,69 @@
+# hasanshiri.online - Cursor Rules
+
+## Project Overview
+Bilingual (English/Persian) Blog & Portfolio Platform built with Next.js 14, React, Tailwind CSS, and Supabase.
+
+## Tech Stack
+- **Framework:** Next.js 14 (App Router)
+- **Styling:** Tailwind CSS with RTL support
+- **Database:** Supabase (PostgreSQL with RLS)
+- **Editor:** TipTap rich text editor
+- **Testing:** Jest (unit), Playwright (E2E)
+
+## Bilingual Development Rules
+
+### RTL Support
+- Persian (fa) uses right-to-left layout
+- Always test in both LTR (en) and RTL (fa) modes
+- Use conditional Tailwind classes for direction:
+  ```jsx
+  className={isRtl ? 'flex-row-reverse' : ''}
+  className={isRtl ? 'rotate-180' : ''}
+  className={isRtl ? 'text-right' : 'text-left'}
+  ```
+
+### Translations
+- Location: `lib/locales/en.json` and `lib/locales/fa.json`
+- Always add translations to BOTH files
+- Never hardcode UI text - use translation keys
+
+## Component Patterns
+
+### Server vs Client Components
+- Default to Server Components
+- Use `'use client'` only when needed for:
+  - useState, useEffect, useContext
+  - Event handlers (onClick, onChange)
+  - Browser APIs
+
+### Supabase Usage
+- Server Components: `import { createClient } from '@/lib/supabase/server'`
+- Client Components: `import { createClient } from '@/lib/supabase/client'`
+
+## Routing
+- All public routes use locale prefix: `/en/...` or `/fa/...`
+- Admin routes: `/admin/...` (no locale prefix)
+- Use `href={`/${locale}/path`}` for links
+
+## Key Files to Reference
+- `middleware.js` - i18n routing and auth
+- `lib/i18n-config.js` - Locale configuration
+- `lib/locales/*.json` - Translations
+- `components/editor/TipTapEditor.jsx` - Rich text editor
+
+## Commands
+```bash
+npm run dev       # Start dev server
+npm run build     # Production build
+npm test          # Run unit tests
+npm run test:e2e  # Run E2E tests
+npm run lint      # Run ESLint
+```
+
+## AI Integration
+- OpenRouter API for AI features
+- Server actions in `lib/actions/ai.js`
+- Floating AI assistant in admin panel
+- Bilingual AI fields for translation/generation
+
+*Last updated: 2026-02-18*

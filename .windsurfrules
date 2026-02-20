@@ -1,0 +1,65 @@
+# hasanshiri.online - Windsurf Rules
+
+## Project Identity
+- **Name:** hasanshiri.online
+- **Type:** Bilingual Blog & Portfolio Platform
+- **Domain:** https://hasanshiri.online
+- **Stack:** Next.js 14, React, Tailwind CSS, Supabase
+
+## Architecture
+- **Pattern:** Next.js App Router with Server Components
+- **Locales:** English (en), Persian/Farsi (fa)
+- **Database:** Supabase PostgreSQL with RLS
+
+## Development Guidelines
+
+### Bilingual Support
+1. Always add translations to both `lib/locales/en.json` and `lib/locales/fa.json`
+2. Test all features in both LTR and RTL modes
+3. Use conditional classes for RTL layouts:
+   - `flex-row-reverse` for reversed flex direction
+   - `rotate-180` for directional icons
+   - `text-right` / `text-left` based on locale
+
+### Component Guidelines
+1. Prefer Server Components over Client Components
+2. Use `'use client'` directive only when necessary
+3. Import Supabase client based on context:
+   - Server: `@/lib/supabase/server`
+   - Client: `@/lib/supabase/client`
+
+### Routing
+- Public routes: `/[locale]/path` (en or fa)
+- Admin routes: `/admin/path`
+- Always use locale in navigation links
+
+## Key Directories
+```
+app/
+  [locale]/      # Localized pages
+  admin/         # Admin dashboard
+  api/           # API routes
+components/
+  editor/        # TipTap editor
+  admin/         # Admin components
+  blog/          # Blog components
+lib/
+  actions/       # Server actions
+  supabase/      # Database clients
+  locales/       # Translation files
+```
+
+## Commands
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm test` | Unit tests (Jest) |
+| `npm run test:e2e` | E2E tests (Playwright) |
+
+## AI Features
+- OpenRouter integration for AI-powered content
+- Floating AI assistant in admin panel
+- Bilingual AI fields for translation and generation
+
+*Last updated: 2026-02-18*

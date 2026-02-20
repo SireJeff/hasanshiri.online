@@ -1,0 +1,55 @@
+# hasanshiri.online - Cline Rules
+# Bilingual Blog & Portfolio Platform
+
+[identity]
+name=hasanshiri.online
+description=Bilingual (English/Persian) Blog & Portfolio Platform with AI-powered content management
+domain=https://hasanshiri.online
+stack=Next.js 14, React, Tailwind CSS, Supabase, TipTap
+lang=JavaScript
+
+[architecture]
+pattern=Next.js App Router with Server Components
+locales=en (English), fa (Persian/Farsi)
+
+[entry_points]
+0=app/[locale]/page.jsx (Homepage)
+1=app/[locale]/blog/page.jsx (Blog listing)
+2=app/admin/page.jsx (Admin dashboard)
+
+[bilingual]
+rtl_support=true
+translation_files=lib/locales/en.json, lib/locales/fa.json
+direction_handling=Use dir="rtl" for Persian, conditional classes for layout
+
+[supabase]
+server_client=lib/supabase/server.js
+browser_client=lib/supabase/client.js
+middleware_client=lib/supabase/middleware.js
+rls=All queries protected by Row Level Security
+
+[commands]
+install=npm install
+dev=npm run dev
+build=npm run build
+test=npm test
+test_e2e=npm run test:e2e
+lint=npm run lint
+
+[ai_integration]
+actions=lib/actions/ai.js
+client=lib/openrouter.js
+components=components/admin/shared/FloatingAIAssistant.jsx, BilingualAIField.jsx
+
+[critical_files]
+middleware=middleware.js (i18n + auth)
+i18n_config=lib/i18n-config.js
+editor=components/editor/TipTapEditor.jsx
+layout=app/[locale]/layout.jsx
+
+[testing]
+unit=Jest + React Testing Library
+e2e=Playwright
+coverage=__tests__/, e2e/
+
+*Updated: 2026-02-18*

@@ -1,0 +1,50 @@
+{
+  "name": "hasanshiri.online",
+  "description": "Bilingual (English/Persian) Blog & Portfolio Platform with AI-powered content management",
+  "version": "3.8.1",
+  "techStack": ["Next.js 14", "React", "Tailwind CSS", "Supabase", "TipTap"],
+  "primaryLanguage": "JavaScript",
+  "testing": {
+    "unit": "Jest",
+    "e2e": "Playwright"
+  },
+  "i18n": {
+    "locales": ["en", "fa"],
+    "defaultLocale": "en",
+    "rtlLocales": ["fa"],
+    "translationFiles": "lib/locales/"
+  },
+  "architecture": {
+    "pattern": "Next.js App Router",
+    "serverComponents": true,
+    "localeRouting": true
+  },
+  "keyDirectories": {
+    "pages": "app/[locale]/",
+    "admin": "app/admin/",
+    "components": "components/",
+    "actions": "lib/actions/",
+    "supabase": "lib/supabase/",
+    "locales": "lib/locales/"
+  },
+  "commands": {
+    "dev": "npm run dev",
+    "build": "npm run build",
+    "test": "npm test",
+    "testE2E": "npm run test:e2e",
+    "lint": "npm run lint"
+  },
+  "bilingualRules": {
+    "alwaysAddBothTranslations": true,
+    "testInBothLocales": true,
+    "useConditionalRtlClasses": true
+  },
+  "aiIntegration": {
+    "provider": "OpenRouter",
+    "actionsFile": "lib/actions/ai.js",
+    "components": [
+      "components/admin/shared/FloatingAIAssistant.jsx",
+      "components/admin/shared/BilingualAIField.jsx"
+    ]
+  }
+}

@@ -1,0 +1,3 @@
+# Windsurf Context
+
+Project: Project

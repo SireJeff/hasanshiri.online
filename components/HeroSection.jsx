@@ -1,6 +1,5 @@
 'use client'
 
-import { ArrowDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const HeroSection = () => {
