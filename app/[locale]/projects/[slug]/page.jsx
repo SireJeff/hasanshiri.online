@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getProjectBySlug } from '@/lib/actions/projects'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
-import { ArrowLeft, Calendar, ExternalLink, Github, Tag } from 'lucide-react'
+import { ArrowLeft, Calendar, ExternalLink, Github, Tag, Home } from 'lucide-react'
 import { i18nConfig, generateAlternateUrls } from '@/lib/i18n-config'
 
 // Force dynamic rendering to avoid cookies() error in generateStaticParams
@@ -120,14 +120,24 @@ export default async function ProjectPage({ params }) {
             {/* Breadcrumbs */}
             <Breadcrumbs items={breadcrumbItems} locale={locale} />
 
-            {/* Back link */}
-            <Link
-              href={`/${locale}#projects`}
-              className={`inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <ArrowLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
-              {isRtl ? 'بازگشت به پروژه‌ها' : 'Back to projects'}
-            </Link>
+            {/* Navigation links */}
+            <div className={`flex items-center gap-4 mb-6 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <Link
+                href={`/${locale}`}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary"
+                title={isRtl ? 'بازگشت به صفحه اصلی' : 'Back to Home'}
+              >
+                <Home className="w-4 h-4" />
+                <span className="hidden sm:inline">{isRtl ? 'خانه' : 'Home'}</span>
+              </Link>
+              <Link
+                href={`/${locale}#projects`}
+                className={`inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
+              >
+                <ArrowLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
+                {isRtl ? 'بازگشت به پروژه‌ها' : 'Back to projects'}
+              </Link>
+            </div>
 
             {/* Title */}
             <h1

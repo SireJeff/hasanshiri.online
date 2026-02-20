@@ -9,7 +9,7 @@ import { RelatedArticles } from '@/components/blog/RelatedArticles'
 import { CommentSection } from '@/components/comments/CommentSection'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import { ArticleJsonLd } from '@/components/seo/JsonLd'
-import { ArrowLeft, Calendar, Clock, Eye, User } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Eye, User, Home } from 'lucide-react'
 import { headers } from 'next/headers'
 import { i18nConfig, generateAlternateUrls } from '@/lib/i18n-config'
 
@@ -168,14 +168,24 @@ export default async function ArticlePage({ params }) {
             {/* Breadcrumbs */}
             <Breadcrumbs items={breadcrumbItems} locale={locale} />
 
-            {/* Back link */}
-            <Link
-              href={`/${locale}/blog`}
-              className={`inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
-            >
-              <ArrowLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
-              {isRtl ? 'بازگشت به بلاگ' : 'Back to blog'}
-            </Link>
+            {/* Navigation links */}
+            <div className={`flex items-center gap-4 mb-6 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <Link
+                href={`/${locale}`}
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary"
+                title={isRtl ? 'بازگشت به صفحه اصلی' : 'Back to Home'}
+              >
+                <Home className="w-4 h-4" />
+                <span className="hidden sm:inline">{isRtl ? 'خانه' : 'Home'}</span>
+              </Link>
+              <Link
+                href={`/${locale}/blog`}
+                className={`inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
+              >
+                <ArrowLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
+                {isRtl ? 'بازگشت به بلاگ' : 'Back to blog'}
+              </Link>
+            </div>
 
             {/* Category */}
             {article.category && (

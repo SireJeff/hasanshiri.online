@@ -9,7 +9,7 @@ import { CategoryFilter, TagCloud } from '@/components/blog/CategoryFilter'
 import { SearchBar } from '@/components/blog/SearchBar'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
 import { BlogJsonLd } from '@/components/seo/JsonLd'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Home } from 'lucide-react'
 import { i18nConfig, generateAlternateUrls } from '@/lib/i18n-config'
 
 // Generate static params for all locales
@@ -241,10 +241,11 @@ export default async function BlogPage({ params, searchParams }) {
           <Breadcrumbs items={breadcrumbItems} locale={locale} />
           <Link
             href={`/${locale}`}
-            className={`inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors ${isRtl ? 'flex-row-reverse' : ''}`}
+            className={`inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors px-3 py-1.5 rounded-lg bg-secondary/50 hover:bg-secondary ${isRtl ? 'flex-row-reverse' : ''}`}
+            title={isRtl ? 'بازگشت به صفحه اصلی' : 'Back to Home'}
           >
-            <ArrowLeft className={`w-4 h-4 ${isRtl ? 'rotate-180' : ''}`} />
-            {isRtl ? 'بازگشت به خانه' : 'Back to home'}
+            <Home className="w-4 h-4" />
+            <span>{isRtl ? 'خانه' : 'Home'}</span>
           </Link>
           <h1 className="text-4xl font-bold text-foreground mb-3">
             {isRtl ? 'بلاگ' : 'Blog'}
