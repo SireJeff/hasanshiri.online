@@ -1,6 +1,7 @@
 'use client'
 
-import { ArrowRight, ExternalLink, Github, Youtube, Container, BookOpen } from "lucide-react";
+import Link from 'next/link'
+import { ArrowRight, ExternalLink, Github, Youtube, Container, BookOpen, ArrowUpRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getProjects } from "@/lib/actions/projects";
@@ -13,7 +14,8 @@ export const ProjectsSection = () => {
   const [externalLinks, setExternalLinks] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const locale = i18n.language || 'en';
+  // Normalize locale: 'en-US' -> 'en', 'fa-IR' -> 'fa'
+  const locale = (i18n.language || 'en').split('-')[0];
 
   // Fetch projects and settings
   useEffect(() => {
@@ -72,37 +74,58 @@ export const ProjectsSection = () => {
               key={project.id}
               className="group bg-card rounded-lg overflow-hidden shadow-xs card-hover"
             >
-              <div className="h-48 overflow-hidden">
-                <img
-                  src={project.featured_image || '/placeholder-project.jpg'}
-                  alt={project[`title_${locale}`] || project.title_en}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              </div>
+              {/* Clickable image area */}
+              <Link
+                href={`/${locale}/projects/${project.slug}`}
+                className="block"
+              >
+                <div className="h-48 overflow-hidden relative">
+                  <img
+                    src={project.featured_image || '/placeholder-project.jpg'}
+                    alt={project[`title_${locale}`] || project.title_en}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {/* View Details indicator */}
+                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <span className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
+                      {locale === 'fa' ? 'مشاهده جزئیات' : 'View Details'}
+                      <ArrowUpRight size={16} />
+                    </span>
+                  </div>
+                </div>
+              </Link>
 
               <div className="p-6">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {(project.tags || []).slice(0, 4).map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground"
-                    >
-                      {tag[`name_${locale}`] || tag.name_en}
-                    </span>
-                  ))}
-                  {(project.tags || []).length > 4 && (
-                    <span className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground">
-                      +{project.tags.length - 4}
-                    </span>
-                  )}
-                </div>
+                {/* Clickable tags */}
+                <Link href={`/${locale}/projects/${project.slug}`}>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {(project.tags || []).slice(0, 4).map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground"
+                      >
+                        {tag[`name_${locale}`] || tag.name_en}
+                      </span>
+                    ))}
+                    {(project.tags || []).length > 4 && (
+                      <span className="px-2 py-1 text-xs font-medium border rounded-full bg-secondary text-secondary-foreground">
+                        +{project.tags.length - 4}
+                      </span>
+                    )}
+                  </div>
+                </Link>
 
-                <h3 className="text-xl font-semibold mb-1">
-                  {project[`title_${locale}`] || project.title_en}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                  {project[`description_${locale}`] || project.description_en}
-                </p>
+                {/* Clickable title and description */}
+                <Link href={`/${locale}/projects/${project.slug}`}>
+                  <h3 className="text-xl font-semibold mb-1 group-hover:text-primary transition-colors">
+                    {project[`title_${locale}`] || project.title_en}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                    {project[`description_${locale}`] || project.description_en}
+                  </p>
+                </Link>
+
+                {/* External links - NOT inside Link */}
                 <div className="flex justify-between items-center">
                   <div className="flex space-x-3">
                     {project.demo_url && (
@@ -126,6 +149,12 @@ export const ProjectsSection = () => {
                       </a>
                     )}
                   </div>
+                  <Link
+                    href={`/${locale}/projects/${project.slug}`}
+                    className="text-sm text-muted-foreground group-hover:text-primary transition-colors"
+                  >
+                    {locale === 'fa' ? 'بیشتر ←' : 'Read more →'}
+                  </Link>
                 </div>
               </div>
             </div>

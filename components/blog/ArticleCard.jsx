@@ -5,7 +5,9 @@ import Image from 'next/image'
 import { Calendar, Clock, Eye, ArrowRight } from 'lucide-react'
 
 export function ArticleCard({ article, locale = 'en' }) {
-  const isRtl = locale === 'fa'
+  // Normalize locale: 'en-US' -> 'en', 'fa-IR' -> 'fa'
+  const normalizedLocale = locale.split('-')[0]
+  const isRtl = normalizedLocale === 'fa'
   const title = isRtl ? (article.title_fa || article.title_en) : article.title_en
   const excerpt = isRtl ? (article.excerpt_fa || article.excerpt_en) : article.excerpt_en
   const categoryName = article.category
@@ -19,9 +21,9 @@ export function ArticleCard({ article, locale = 'en' }) {
       )
     : null
 
-  // Locale-aware URLs
-  const articleUrl = `/${locale}/blog/${article.slug}`
-  const tagUrl = (tagSlug) => `/${locale}/blog?tag=${tagSlug}`
+  // Locale-aware URLs (use normalized locale)
+  const articleUrl = `/${normalizedLocale}/blog/${article.slug}`
+  const tagUrl = (tagSlug) => `/${normalizedLocale}/blog?tag=${tagSlug}`
 
   return (
     <article

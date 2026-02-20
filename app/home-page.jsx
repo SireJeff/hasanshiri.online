@@ -51,10 +51,10 @@ export function HomePage({ locale = 'en' }) {
         {/* Main Content */}
         <main>
           <HeroSection locale={locale} />
-          <AboutSection locale={locale} />
-          <SkillsSection locale={locale} />
           <ProjectsSection locale={locale} />
           <ArticlesSection locale={locale} />
+          <AboutSection locale={locale} />
+          <SkillsSection locale={locale} />
           <ContactSection locale={locale} />
         </main>
 

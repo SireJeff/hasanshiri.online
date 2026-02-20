@@ -12,7 +12,8 @@ export const ArticlesSection = () => {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const locale = i18n.language || 'en'
+  // Normalize locale: 'en-US' -> 'en', 'fa-IR' -> 'fa'
+  const locale = (i18n.language || 'en').split('-')[0]
   const isRtl = locale === 'fa'
 
   // Display counts: 6 on desktop, 3 on mobile

@@ -29,8 +29,8 @@ export const SkillsSection = () => {
     loadSkills();
   }, []);
 
-  // Get locale for language selection
-  const locale = i18n.language || 'en';
+  // Get locale for language selection (normalize: 'en-US' -> 'en')
+  const locale = (i18n.language || 'en').split('-')[0];
 
   // Flatten skills for filtering
   const allSkills = skillsData.flatMap(group => group.skills);
