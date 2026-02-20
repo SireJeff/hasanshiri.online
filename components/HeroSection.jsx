@@ -13,10 +13,16 @@ export const HeroSection = () => {
     >
       <div className="container max-w-4xl mx-auto text-center z-10">
         <div className="space-y-8">
-          {/* Quote Part 1 */}
+          {/* Visually hidden H1 for SEO and accessibility */}
+          <h1 className="sr-only">
+            {t("about.heroSubtitle")} - {t("about.heroDescription")}
+          </h1>
+
+          {/* Quote Part 1 - visible main heading */}
           <p
             className="text-xl md:text-2xl lg:text-3xl font-medium text-foreground leading-relaxed opacity-0 animate-fade-in"
             dir={isRtl ? 'rtl' : 'ltr'}
+            aria-hidden="true"
           >
             {t("hero.quotePart1")}
           </p>
@@ -25,6 +31,7 @@ export const HeroSection = () => {
           <p
             className="text-lg md:text-xl lg:text-2xl text-muted-foreground italic leading-relaxed opacity-0 animate-fade-in-delay-1"
             dir={isRtl ? 'rtl' : 'ltr'}
+            aria-hidden="true"
           >
             {t("hero.quotePart2")}
           </p>
@@ -33,6 +40,7 @@ export const HeroSection = () => {
           <p
             className="text-sm md:text-base text-muted-foreground/70 opacity-0 animate-fade-in-delay-2"
             dir={isRtl ? 'rtl' : 'ltr'}
+            aria-hidden="true"
           >
             {t("hero.author")}
           </p>
