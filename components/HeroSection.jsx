@@ -3,36 +3,39 @@
 import { useTranslation } from "react-i18next";
 
 export const HeroSection = () => {
-  const { t } = useTranslation();
-  
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'fa';
+
   return (
     <section
       id="hero"
-      className="relative py-24 flex flex-col items-center justify-center px-4"
+      className="relative py-24 md:py-32 flex flex-col items-center justify-center px-4"
     >
       <div className="container max-w-4xl mx-auto text-center z-10">
-        <div className="space-y-6">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            <span className="opacity-0 animate-fade-in">{t("hero.greeting")}</span>
-            <span className="text-primary opacity-0 animate-fade-in-delay-1">
-              {" "}
-              {t("hero.firstName")}
-            </span>
-            <span className="text-gradient ml-2 opacity-0 animate-fade-in-delay-2">
-              {" "}
-              {t("hero.lastName")}
-            </span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto opacity-0 animate-fade-in-delay-3">
-            {t("hero.description")}
+        <div className="space-y-8">
+          {/* Quote Part 1 */}
+          <p
+            className="text-xl md:text-2xl lg:text-3xl font-medium text-foreground leading-relaxed opacity-0 animate-fade-in"
+            dir={isRtl ? 'rtl' : 'ltr'}
+          >
+            {t("hero.quotePart1")}
           </p>
 
-          <div className="pt-4 opacity-0 animate-fade-in-delay-4">
-            <a href="#contact" className="cosmic-button">
-              {t("hero.getInTouch")}
-            </a>
-          </div>
+          {/* Quote Part 2 */}
+          <p
+            className="text-lg md:text-xl lg:text-2xl text-muted-foreground italic leading-relaxed opacity-0 animate-fade-in-delay-1"
+            dir={isRtl ? 'rtl' : 'ltr'}
+          >
+            {t("hero.quotePart2")}
+          </p>
+
+          {/* Author Attribution */}
+          <p
+            className="text-sm md:text-base text-muted-foreground/70 opacity-0 animate-fade-in-delay-2"
+            dir={isRtl ? 'rtl' : 'ltr'}
+          >
+            {t("hero.author")}
+          </p>
         </div>
       </div>
     </section>

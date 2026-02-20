@@ -4,15 +4,31 @@ import { Briefcase, Code, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const AboutSection = () => {
-  const { t } = useTranslation();
-  
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'fa';
+
   return (
     <section id="about" className="py-24 px-4 relative">
       {" "}
       <div className="container mx-auto max-w-5xl">
-        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
-          {t("about.title")} <span className="text-primary">{t("about.me")}</span>
-        </h2>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            {t("about.title")} <span className="text-primary">{t("about.me")}</span>
+          </h2>
+
+          {/* Hero content as subtitle */}
+          <div className="space-y-3">
+            <h3 className="text-xl md:text-2xl font-semibold text-foreground">
+              {t("about.heroSubtitle")}
+            </h3>
+            <p
+              className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto"
+              dir={isRtl ? 'rtl' : 'ltr'}
+            >
+              {t("about.heroDescription")}
+            </p>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">

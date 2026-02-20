@@ -17,11 +17,9 @@
     "contact": "Contact"
   },
   "hero": {
-    "greeting": "Hi, I'm",
-    "firstName": "Mohammad Hassan",
-    "lastName": "Shiri",
-    "description": "An inquisitive Physics undergraduate at Sharif University with a deep-seated passion for modeling complex systems and leveraging data to uncover foundational insights.",
-    "getInTouch": "Get In Touch"
+    "quotePart1": "Whoever seeks culture, virtuosity, courage, experience, pride, knowledge, does not love.",
+    "quotePart2": "In the embrace, God and the I are dead.",
+    "author": "— Pascal Quignard"
   },
   "ai": {
     "greeting": "Hi, I'm",
@@ -56,6 +54,8 @@
   "about": {
     "title": "About",
     "me": "Me",
+    "heroSubtitle": "Hi, I'm Mohammad Hassan Shiri",
+    "heroDescription": "An inquisitive Physics undergraduate at Sharif University with a deep-seated passion for modeling complex systems and leveraging data to uncover foundational insights.",
     "subtitle": "Analytical Researcher | Complex Systems Enthusiast | Data Scientist",
     "paragraph1": "I'm currently pursuing a Physics degree at Sharif University of Technology (2023-2027), building upon my Computer Engineering background from University of Isfahan (2019-2023). This unique combination of technical expertise allows me to approach complex problems from both computational and theoretical physics perspectives.",
     "paragraph2": "My professional journey includes serving as a Commercial Specialist at Kavosh Energy Pasargad (late 2020-2021) and currently working as a Commercial Specialist and Deputy Inspector at Sakht Kooshan Matin Company (2022-present). These experiences have sharpened my analytical skills in business process optimization, market research, and international trade—skills that Hasan Shiri now applies to data science and complex systems modeling.",
