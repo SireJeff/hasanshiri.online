@@ -62,7 +62,7 @@ export function BilingualAIField({
    * Translates the currently active field to the other language
    */
   const handleTranslate = async () => {
-    if (!activeValue || !activeValue.trim()) {
+    if (!activeValue || typeof activeValue !== 'string' || !activeValue.trim()) {
       return
     }
 
@@ -162,7 +162,7 @@ export function BilingualAIField({
    * Improves the currently active field's content
    */
   const handleRefine = async () => {
-    if (!activeValue || !activeValue.trim()) {
+    if (!activeValue || typeof activeValue !== 'string' || !activeValue.trim()) {
       return
     }
 
@@ -224,9 +224,9 @@ export function BilingualAIField({
         <div className="flex items-center gap-1.5">
           {enableTranslate && (
             <AITranslateButton
-              sourceText={activeValue}
+              sourceText={typeof activeValue === 'string' ? activeValue : ''}
               onTranslate={handleTranslate}
-              disabled={isAILoading || !activeValue?.trim()}
+              disabled={isAILoading || typeof activeValue !== 'string' || !activeValue.trim()}
             />
           )}
 
@@ -240,7 +240,7 @@ export function BilingualAIField({
           {enableRefine && (
             <AIRefineButton
               onClick={handleRefine}
-              disabled={isAILoading || !activeValue?.trim()}
+              disabled={isAILoading || typeof activeValue !== 'string' || !activeValue.trim()}
             />
           )}
         </div>
