@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { AIGenerateModal } from '@/components/admin/shared/AIGenerateModal'
 import { AISeoButton } from '@/components/admin/shared/AISeoButton'
 import { aiGenerateProject, aiTranslateAll, aiGenerateSEO } from '@/lib/actions/ai'
+import { ImageUpload } from '@/components/editor/ImageUpload'
 
 // Dynamic import for TipTap to avoid SSR issues
 const TipTapEditor = dynamic(
@@ -314,24 +315,31 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
     setIsSubmitting(true)
     setMessage(null)
 
+    console.log('[ProjectForm] Submitting form...', { mode, projectId: project?.id })
+
     try {
       const submitData = {
         ...formData,
         tag_ids: selectedTagIds,
       }
 
+      console.log('[ProjectForm] Submit data:', { title: submitData.title_en, tags: submitData.tag_ids?.length })
+
       if (mode === 'create') {
         const result = await createProject(submitData)
+        console.log('[ProjectForm] Create result:', result)
         if (result.error) {
           throw new Error(result.error)
         }
       } else {
         const result = await updateProject(project.id, submitData)
+        console.log('[ProjectForm] Update result:', result)
         if (result.error) {
           throw new Error(result.error)
         }
       }
 
+      console.log('[ProjectForm] Success! Showing toast and redirecting...')
       toast({
         title: mode === 'create' ? 'Project created' : 'Project updated',
         description: mode === 'create' ? 'Your new project has been added successfully.' : 'The project has been updated successfully.',
@@ -339,10 +347,11 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
       router.push('/admin/projects')
       router.refresh()
     } catch (error) {
-      console.error('Error saving project:', error)
+      console.error('[ProjectForm] Error saving project:', error)
       toast({
         title: 'Error',
-        description: mode === 'create' ? 'Failed to create project' : 'Failed to update project',
+        description: error.message || (mode === 'create' ? 'Failed to create project' : 'Failed to update project'),
+        variant: 'destructive',
       })
     } finally {
       setIsSubmitting(false)
@@ -465,6 +474,19 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
               placeholder="Write detailed project description here..."
             />
           </div>
+        </div>
+
+        {/* Featured Image / Thumbnail */}
+        <div className="p-4 bg-card border border-border rounded-xl space-y-4">
+          <h3 className="font-medium text-foreground">Project Thumbnail</h3>
+          <p className="text-sm text-muted-foreground">
+            Upload a thumbnail image for the project card display.
+          </p>
+          <ImageUpload
+            value={formData.featured_image}
+            onChange={(url) => setFormData(prev => ({ ...prev, featured_image: url }))}
+            folder="projects"
+          />
         </div>
 
         {/* URLs Section */}
