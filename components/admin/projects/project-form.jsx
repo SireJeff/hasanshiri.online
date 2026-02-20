@@ -11,7 +11,8 @@ import { cn } from '@/lib/utils'
 import { ArrowLeft, Loader2, Github as GithubIcon, ExternalLink, Sparkles, Languages } from 'lucide-react'
 import Link from 'next/link'
 import { AIGenerateModal } from '@/components/admin/shared/AIGenerateModal'
-import { aiGenerateProject, aiTranslateAll } from '@/lib/actions/ai'
+import { AISeoButton } from '@/components/admin/shared/AISeoButton'
+import { aiGenerateProject, aiTranslateAll, aiGenerateSEO } from '@/lib/actions/ai'
 
 // Dynamic import for TipTap to avoid SSR issues
 const TipTapEditor = dynamic(
@@ -30,6 +31,7 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
   const [message, setMessage] = useState(null)
   const [showGenerateModal, setShowGenerateModal] = useState(false)
   const [isTranslatingAll, setIsTranslatingAll] = useState(false)
+  const [isGeneratingSEO, setIsGeneratingSEO] = useState(false)
 
   // Tag management state
   const [allTags, setAllTags] = useState(tags || [])
@@ -52,6 +54,10 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
     status: project?.status || 'active',
     is_featured: project?.is_featured || false,
     sort_order: project?.sort_order || 0,
+    meta_title_en: project?.meta_title_en || '',
+    meta_title_fa: project?.meta_title_fa || '',
+    meta_description_en: project?.meta_description_en || '',
+    meta_description_fa: project?.meta_description_fa || '',
   })
 
   // Load all tags
@@ -205,6 +211,8 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
           [`title${sourceSuffix}`]: formData[`title${sourceSuffix}`],
           [`description${sourceSuffix}`]: formData[`description${sourceSuffix}`],
           [`content${sourceSuffix}`]: formData[`long_description${sourceSuffix}`],
+          [`meta_title${sourceSuffix}`]: formData[`meta_title${sourceSuffix}`],
+          [`meta_description${sourceSuffix}`]: formData[`meta_description${sourceSuffix}`],
         },
         direction,
       })
@@ -221,6 +229,8 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
         [`title${targetSuffix}`]: result.translated?.[`title${targetSuffix}`] || prev[`title${targetSuffix}`],
         [`description${targetSuffix}`]: result.translated?.[`description${targetSuffix}`] || prev[`description${targetSuffix}`],
         [`long_description${targetSuffix}`]: result.translated?.[`content${targetSuffix}`] || prev[`long_description${targetSuffix}`],
+        [`meta_title${targetSuffix}`]: result.translated?.[`meta_title${targetSuffix}`] || prev[`meta_title${targetSuffix}`],
+        [`meta_description${targetSuffix}`]: result.translated?.[`meta_description${targetSuffix}`] || prev[`meta_description${targetSuffix}`],
       }))
       toast({
         title: 'Translation Complete',
@@ -236,6 +246,66 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
       }
     } finally {
       setIsTranslatingAll(false)
+    }
+  }
+
+  /**
+   * Generate SEO meta tags using AI
+   * Analyzes project content and generates optimized titles and descriptions
+   */
+  const handleGenerateSEO = async () => {
+    // Need at least a title to generate SEO
+    if (!formData.title_en && !formData.title_fa) {
+      toast({
+        title: 'Cannot Generate SEO',
+        description: 'Please add at least a title before generating SEO meta tags.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    setIsGeneratingSEO(true)
+    try {
+      const result = await aiGenerateSEO({
+        type: 'project',
+        title_en: formData.title_en,
+        title_fa: formData.title_fa,
+        excerpt_en: formData.description_en,
+        excerpt_fa: formData.description_fa,
+        content_en: formData.long_description_en,
+        content_fa: formData.long_description_fa,
+      })
+
+      if (result.error) {
+        toast({
+          title: 'SEO Generation Failed',
+          description: result.error,
+          variant: 'destructive',
+        })
+        return
+      }
+
+      // Update form with generated SEO fields
+      setFormData(prev => ({
+        ...prev,
+        meta_title_en: result.meta_title_en || prev.meta_title_en,
+        meta_title_fa: result.meta_title_fa || prev.meta_title_fa,
+        meta_description_en: result.meta_description_en || prev.meta_description_en,
+        meta_description_fa: result.meta_description_fa || prev.meta_description_fa,
+      }))
+
+      toast({
+        title: 'SEO Generated',
+        description: 'Meta titles and descriptions have been generated for both languages.',
+      })
+    } catch (error) {
+      toast({
+        title: 'SEO Generation Failed',
+        description: error.message || 'An unexpected error occurred',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsGeneratingSEO(false)
     }
   }
 
@@ -591,6 +661,87 @@ export function ProjectForm({ tags, project, mode = 'create' }) {
                   className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="0"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* SEO Settings */}
+          <div className="p-4 bg-card border border-border rounded-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-foreground">SEO Settings</h3>
+              <AISeoButton
+                onClick={handleGenerateSEO}
+                loading={isGeneratingSEO}
+                disabled={isGeneratingSEO || (!formData.title_en && !formData.title_fa)}
+              />
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Auto-generate optimized meta titles (50-60 chars) and descriptions (150-160 chars)
+            </div>
+            <div>
+              <label className="block text-sm text-muted-foreground mb-1.5">
+                Meta Title (EN)
+              </label>
+              <input
+                type="text"
+                name="meta_title_en"
+                value={formData.meta_title_en}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg text-foreground focus:border-primary outline-none"
+                placeholder="Custom title for search engines"
+              />
+              <div className="text-xs text-muted-foreground mt-1 text-right">
+                {formData.meta_title_en?.length || 0}/60
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-muted-foreground mb-1.5">
+                Meta Description (EN)
+              </label>
+              <textarea
+                name="meta_description_en"
+                value={formData.meta_description_en}
+                onChange={handleChange}
+                rows={2}
+                className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg text-foreground focus:border-primary outline-none resize-none"
+                placeholder="Custom description for search engines"
+              />
+              <div className="text-xs text-muted-foreground mt-1 text-right">
+                {formData.meta_description_en?.length || 0}/160
+              </div>
+            </div>
+            <div className="border-t border-border pt-4 mt-4">
+              <label className="block text-sm text-muted-foreground mb-1.5">
+                Meta Title (FA)
+              </label>
+              <input
+                type="text"
+                name="meta_title_fa"
+                value={formData.meta_title_fa}
+                onChange={handleChange}
+                className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg text-foreground focus:border-primary outline-none text-right"
+                dir="rtl"
+                placeholder="عنوان برای موتورهای جستجو"
+              />
+              <div className="text-xs text-muted-foreground mt-1 text-right">
+                {formData.meta_title_fa?.length || 0}/60
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-muted-foreground mb-1.5">
+                Meta Description (FA)
+              </label>
+              <textarea
+                name="meta_description_fa"
+                value={formData.meta_description_fa}
+                onChange={handleChange}
+                rows={2}
+                className="w-full px-3 py-2 text-sm bg-secondary border border-border rounded-lg text-foreground focus:border-primary outline-none resize-none text-right"
+                dir="rtl"
+                placeholder="توضیحات برای موتورهای جستجو"
+              />
+              <div className="text-xs text-muted-foreground mt-1 text-right">
+                {formData.meta_description_fa?.length || 0}/160
               </div>
             </div>
           </div>

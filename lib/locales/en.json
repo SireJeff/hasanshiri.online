@@ -36,6 +36,7 @@
     "translate": "Translate",
     "generate": "Generate",
     "refine": "Refine",
+    "generate_seo": "SEO",
     "selectModel": "Select Model",
     "quickActions": "Quick Actions",
     "minimize": "Minimize",
