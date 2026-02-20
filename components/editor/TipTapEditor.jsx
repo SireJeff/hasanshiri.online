@@ -19,7 +19,7 @@ import {
   AlignLeft, AlignCenter, AlignRight,
   Undo, Redo, Highlighter, FileCode2,
 } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 
 const lowlight = createLowlight(common)
 
@@ -75,6 +75,7 @@ export function TipTapEditor({
     ],
     content,
     editable,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange?.(editor.getHTML())
     },
@@ -84,6 +85,16 @@ export function TipTapEditor({
       },
     },
   })
+
+  // Sync external content changes (e.g., from AI translation)
+  useEffect(() => {
+    if (editor && content !== undefined && content !== editor.getHTML()) {
+      // Only update if content is different and editor is not focused (to avoid disrupting user typing)
+      if (!editor.isFocused) {
+        editor.commands.setContent(content, false)
+      }
+    }
+  }, [editor, content])
 
   const addImage = useCallback(async () => {
     if (onImageUpload) {
