@@ -1,12 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Moon, Sun, Save, Loader2, HardDrive, Image as ImageIcon, Mail, Phone, MapPin, Github, Linkedin, Twitter, Youtube, Send, MessageCircle, Instagram, Anchor, ExternalLink } from 'lucide-react'
+import { User, Moon, Sun, Save, Loader2, HardDrive, Image as ImageIcon, Mail, Phone, MapPin, Github, Linkedin, Twitter, Youtube, Send, MessageCircle, Instagram, Anchor, ExternalLink, Sparkles } from 'lucide-react'
 import { getProfile, updateProfile, getStorageStats, getSiteSettings, updateSiteSettings } from '@/lib/actions/settings'
-import { useAI } from '@/components/admin/shared/AIContext'
+import { getUserPresets, updateUserPresets } from '@/lib/actions/ai'
 import { uploadImage } from '@/lib/actions/storage'
 import { useTheme } from '@/app/providers'
 import { cn } from '@/lib/utils'
+
+// Helper function to get setting value (client-side)
+function getSettingValue(settings, key, defaultValue = null, locale = 'en') {
+  const setting = settings?.byKey?.[key]
+  if (!setting) return defaultValue
+  return locale === 'fa' ? (setting.value_fa || setting.value_en) : setting.value_en
+}
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile')
@@ -35,6 +42,16 @@ export default function SettingsPage() {
 
   // Theme
   const { isDark, toggleDarkMode } = useTheme()
+
+  // AI presets state
+  const [aiPresets, setAIPresets] = useState({
+    translateFast: '',
+    translateBalanced: '',
+    articleGenerator: '',
+    contentRefiner: '',
+    projectGenerator: '',
+  })
+  const [aiSettingsLoading, setAISettingsLoading] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -66,27 +83,36 @@ export default function SettingsPage() {
       const s = settingsResult.settings
       setSiteSettings({
         contact: {
-          email: s.get('contact_email', '', 'en'),
-          phone: s.get('contact_phone', '', 'en'),
-          location_en: s.get('contact_location', '', 'en'),
-          location_fa: s.get('contact_location', '', 'fa'),
+          email: getSettingValue(s, 'contact_email', '', 'en'),
+          phone: getSettingValue(s, 'contact_phone', '', 'en'),
+          location_en: getSettingValue(s, 'contact_location', '', 'en'),
+          location_fa: getSettingValue(s, 'contact_location', '', 'fa'),
         },
         social: {
-          github: s.get('social_github', '', 'en'),
-          linkedin: s.get('social_linkedin', '', 'en'),
-          twitter: s.get('social_twitter', '', 'en'),
-          youtube: s.get('social_youtube', '', 'en'),
-          telegram: s.get('social_telegram', '', 'en'),
-          whatsapp: s.get('social_whatsapp', '', 'en'),
-          instagram: s.get('social_instagram', '', 'en'),
-          dockerhub: s.get('social_dockerhub', '', 'en'),
-          virgool: s.get('social_virgool', '', 'en'),
+          github: getSettingValue(s, 'social_github', '', 'en'),
+          linkedin: getSettingValue(s, 'social_linkedin', '', 'en'),
+          twitter: getSettingValue(s, 'social_twitter', '', 'en'),
+          youtube: getSettingValue(s, 'social_youtube', '', 'en'),
+          telegram: getSettingValue(s, 'social_telegram', '', 'en'),
+          whatsapp: getSettingValue(s, 'social_whatsapp', '', 'en'),
+          instagram: getSettingValue(s, 'social_instagram', '', 'en'),
+          dockerhub: getSettingValue(s, 'social_dockerhub', '', 'en'),
+          virgool: getSettingValue(s, 'social_virgool', '', 'en'),
         },
         github: {
-          username: s.get('github_username', '', 'en'),
-          syncEnabled: s.get('github_sync_enabled', false, 'en') === true || s.get('github_sync_enabled', 'false', 'en') === 'true',
+          username: getSettingValue(s, 'github_username', '', 'en'),
+          syncEnabled: getSettingValue(s, 'github_sync_enabled', false, 'en') === true || getSettingValue(s, 'github_sync_enabled', 'false', 'en') === 'true',
         },
       })
+    }
+
+    // Load AI presets from database
+    const presetsResult = await getUserPresets()
+    if (presetsResult.success && presetsResult.presets) {
+      setAIPresets(prev => ({
+        ...prev,
+        ...presetsResult.presets,
+      }))
     }
 
     setLoading(false)
@@ -175,6 +201,28 @@ export default function SettingsPage() {
       setMessage({ type: 'error', text: error.message })
     } finally {
       setSettingsLoading(false)
+    }
+  }
+
+  async function handleAISettingsSubmit() {
+    setAISettingsLoading(true)
+    setMessage(null)
+
+    try {
+      // Save AI presets to database
+      const result = await updateUserPresets(aiPresets)
+      if (result.error) {
+        setMessage({ type: 'error', text: result.error })
+        if (result.validationErrors) {
+          console.error('Validation errors:', result.validationErrors)
+        }
+      } else {
+        setMessage({ type: 'success', text: 'AI settings saved successfully' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: error.message })
+    } finally {
+      setAISettingsLoading(false)
     }
   }
 
@@ -760,6 +808,125 @@ export default function SettingsPage() {
                 <Save size={18} />
               )}
               Save GitHub Settings
+            </button>
+          </form>
+        )}
+
+        {/* AI Tab */}
+        {activeTab === 'ai' && (
+          <form onSubmit={(e) => { e.preventDefault(); handleAISettingsSubmit(); }} className="space-y-6 max-w-xl">
+            <div>
+              <h3 className="text-lg font-medium text-foreground mb-4">AI Settings</h3>
+              <p className="text-sm text-muted-foreground">
+                Configure OpenRouter presets for AI features. Presets are managed at{' '}
+                <a
+                  href="https://openrouter.ai/presets"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  openrouter.ai/presets
+                </a>
+              </p>
+            </div>
+
+            <div className="p-4 bg-secondary/30 rounded-lg border border-border space-y-3">
+              <p className="text-sm text-foreground">
+                <strong>How it works:</strong> Enter the preset slugs from your OpenRouter dashboard (e.g., <code className="px-1.5 py-0.5 bg-background rounded text-xs">@preset/translate-fast</code>). These presets control which AI models are used for translation, generation, and refinement.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Translate (Fast)
+              </label>
+              <input
+                type="text"
+                value={aiPresets.translateFast || ''}
+                onChange={(e) => setAIPresets(prev => ({ ...prev, translateFast: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+                placeholder="@preset/translate-fast"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Used for quick translations between English and Persian
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Translate (Balanced)
+              </label>
+              <input
+                type="text"
+                value={aiPresets.translateBalanced || ''}
+                onChange={(e) => setAIPresets(prev => ({ ...prev, translateBalanced: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+                placeholder="@preset/translate-balanced"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Used for higher quality translations
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Article Generator
+              </label>
+              <input
+                type="text"
+                value={aiPresets.articleGenerator || ''}
+                onChange={(e) => setAIPresets(prev => ({ ...prev, articleGenerator: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+                placeholder="@preset/article-generator"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Used for generating article content
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Content Refiner
+              </label>
+              <input
+                type="text"
+                value={aiPresets.contentRefiner || ''}
+                onChange={(e) => setAIPresets(prev => ({ ...prev, contentRefiner: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+                placeholder="@preset/content-refiner"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Used for improving and refining content
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Project Generator
+              </label>
+              <input
+                type="text"
+                value={aiPresets.projectGenerator || ''}
+                onChange={(e) => setAIPresets(prev => ({ ...prev, projectGenerator: e.target.value }))}
+                className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary font-mono text-sm"
+                placeholder="@preset/project-generator"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Used for generating project descriptions
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={aiSettingsLoading}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              {aiSettingsLoading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <Save size={18} />
+              )}
+              Save AI Settings
             </button>
           </form>
         )}

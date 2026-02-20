@@ -35,6 +35,7 @@ export function FloatingAIAssistant() {
     generate: '',
     refine: '',
   })
+  const [validationErrors, setValidationErrors] = useState({})
   const messagesEndRef = useRef(null)
 
   const locale = t('ai.assistant') || 'AI Assistant'
@@ -55,6 +56,14 @@ export function FloatingAIAssistant() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages])
+
+  const handlePresetChange = (field, value) => {
+    setSettingsPresets({ ...settingsPresets, [field]: value })
+    // Clear validation error when user types
+    if (validationErrors[field]) {
+      setValidationErrors({ ...validationErrors, [field]: null })
+    }
+  }
 
   const handleSend = async () => {
     if (!inputValue.trim() || isStreaming) return
@@ -139,6 +148,24 @@ export function FloatingAIAssistant() {
   }
 
   const handleSaveSettings = async () => {
+    // Client-side validation before saving
+    const errors = {}
+    for (const [key, value] of Object.entries(settingsPresets)) {
+      if (value && !value.startsWith('@preset/') && !value.includes('/')) {
+        errors[key] = 'Invalid format. Use @preset/name or provider/model'
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors)
+      addToHistory({
+        role: 'assistant',
+        content: 'Please fix the following preset format errors:\n' +
+          Object.entries(errors).map(([k, v]) => `- ${k}: ${v}`).join('\n')
+      })
+      return
+    }
+
     const result = await saveUserPresets(settingsPresets)
     if (result.success) {
       addToHistory({ role: 'assistant', content: t('ai.presetSaved') })
@@ -222,10 +249,17 @@ export function FloatingAIAssistant() {
                     <input
                       type="text"
                       value={settingsPresets.translateFast || ''}
-                      onChange={(e) => setSettingsPresets({...settingsPresets, translateFast: e.target.value})}
+                      onChange={(e) => handlePresetChange('translateFast', e.target.value)}
                       placeholder="@preset/translate-fast"
-                      className="w-full px-2 py-1 text-xs bg-card border border-border rounded"
+                      className={`w-full px-2 py-1 text-xs bg-card border rounded ${
+                        validationErrors.translateFast
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-border focus:border-primary'
+                      }`}
                     />
+                    {validationErrors.translateFast && (
+                      <p className="text-xs text-red-500 mt-1">{validationErrors.translateFast}</p>
+                    )}
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground block mb-1">
@@ -234,10 +268,17 @@ export function FloatingAIAssistant() {
                     <input
                       type="text"
                       value={settingsPresets.translateBalanced || ''}
-                      onChange={(e) => setSettingsPresets({...settingsPresets, translateBalanced: e.target.value})}
+                      onChange={(e) => handlePresetChange('translateBalanced', e.target.value)}
                       placeholder="@preset/translate-balanced"
-                      className="w-full px-2 py-1 text-xs bg-card border border-border rounded"
+                      className={`w-full px-2 py-1 text-xs bg-card border rounded ${
+                        validationErrors.translateBalanced
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-border focus:border-primary'
+                      }`}
                     />
+                    {validationErrors.translateBalanced && (
+                      <p className="text-xs text-red-500 mt-1">{validationErrors.translateBalanced}</p>
+                    )}
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground block mb-1">
@@ -246,10 +287,17 @@ export function FloatingAIAssistant() {
                     <input
                       type="text"
                       value={settingsPresets.generate || ''}
-                      onChange={(e) => setSettingsPresets({...settingsPresets, generate: e.target.value})}
+                      onChange={(e) => handlePresetChange('generate', e.target.value)}
                       placeholder="@preset/article-generator"
-                      className="w-full px-2 py-1 text-xs bg-card border border-border rounded"
+                      className={`w-full px-2 py-1 text-xs bg-card border rounded ${
+                        validationErrors.generate
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-border focus:border-primary'
+                      }`}
                     />
+                    {validationErrors.generate && (
+                      <p className="text-xs text-red-500 mt-1">{validationErrors.generate}</p>
+                    )}
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground block mb-1">
@@ -258,10 +306,17 @@ export function FloatingAIAssistant() {
                     <input
                       type="text"
                       value={settingsPresets.refine || ''}
-                      onChange={(e) => setSettingsPresets({...settingsPresets, refine: e.target.value})}
+                      onChange={(e) => handlePresetChange('refine', e.target.value)}
                       placeholder="@preset/content-refiner"
-                      className="w-full px-2 py-1 text-xs bg-card border border-border rounded"
+                      className={`w-full px-2 py-1 text-xs bg-card border rounded ${
+                        validationErrors.refine
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-border focus:border-primary'
+                      }`}
                     />
+                    {validationErrors.refine && (
+                      <p className="text-xs text-red-500 mt-1">{validationErrors.refine}</p>
+                    )}
                   </div>
                   <button
                     onClick={handleSaveSettings}

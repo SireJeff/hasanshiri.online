@@ -8,29 +8,26 @@ const securityHeaders = [
   },
   {
     key: 'Strict-Transport-Security',
-    value: 'max-age=63072000; includeSubDomains; preload',
+    value: 'max-age=6307200; includeSubDomains',
   },
   {
     key: 'X-Frame-Options',
     value: 'SAMEORIGIN',
   },
   {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
+    key: 'X-XSS-Protection',
+    value: '1; mode=block',
   },
   {
     key: 'Referrer-Policy',
     value: 'strict-origin-when-cross-origin',
-  },
-  {
-    key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=()',
   },
 ]
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
@@ -38,76 +35,23 @@ const nextConfig = {
         hostname: '**.supabase.co',
       },
     ],
-    // Use modern image formats for better performance
     formats: ['image/avif', 'image/webp'],
-    // Define device sizes for responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    // Define image sizes for srcset
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Enable image optimization for better LCP
     minimumCacheTTL: 60,
   },
   // Optimize font loading for better performance
-  optimizeFonts: true,
-  // Enable experimental features for better i18n support
   experimental: {
-    // Enable server actions
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
+    fontLoaders: [
+      { loader: 'next/font/google', options: { display: 'swap' } },
+    ],
   },
-  // Disable ESLint during build for faster deployment
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  // Disable TypeScript during build for faster deployment
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  // Security headers
-  async headers() {
-    return [
-      {
-        // Apply to all routes
-        source: '/:path*',
-        headers: securityHeaders,
-      },
-    ]
-  },
-  // Compression is handled by Vercel/hosting platform
-  compress: true,
 }
 
 // Sentry configuration
-const sentryWebpackPluginOptions = {
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
-
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
-
-  // Upload source maps for better error debugging
-  widenClientFileUpload: true,
-
-  // Route browser requests to Sentry through a Next.js rewrite
-  tunnelRoute: '/monitoring',
-
-  // Hides source maps from generated client bundles
-  hideSourceMaps: true,
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-
-  // Enable automatic instrumentation of Vercel Cron Monitors
-  automaticVercelMonitors: true,
+const sentryConfig = {
+  tracesSampleRate: 1.0,
 }
 
-// Only wrap with Sentry if DSN is configured
-const config = process.env.NEXT_PUBLIC_SENTRY_DSN
-  ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
-  : nextConfig
-
-export default config
+// Merge with Sentry config
+export default withSentryConfig(nextConfig, sentryConfig)

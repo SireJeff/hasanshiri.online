@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 import { getUserPresets as fetchUserPresetsServer, updateUserPresets as saveUserPresetsServer } from '@/lib/actions/ai'
+import { getActionableError } from '@/lib/errors/openrouter-errors'
 
 /**
  * AI Context for managing floating assistant state
@@ -77,7 +78,7 @@ export function AIProvider({ children }) {
         return result
       } catch (error) {
         console.error('Failed to fetch user presets:', error)
-        return { error: error.message, success: false }
+        return getActionableError(error)
       } finally {
         setIsLoadingPresets(false)
       }
@@ -92,7 +93,7 @@ export function AIProvider({ children }) {
         return result
       } catch (error) {
         console.error('Failed to save user presets:', error)
-        return { error: error.message, success: false }
+        return getActionableError(error)
       } finally {
         setIsLoadingPresets(false)
       }
