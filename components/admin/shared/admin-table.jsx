@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -87,9 +87,8 @@ export function AdminTable({
               </tr>
             ) : (
               data.map((row, index) => (
-                <>
+                <Fragment key={row.id || index}>
                   <tr
-                    key={row.id || index}
                     className={cn(
                       "hover:bg-secondary/30 transition-colors",
                       onRowClick && "cursor-pointer"
@@ -110,7 +109,7 @@ export function AdminTable({
                     )}
                   </tr>
                   {rowActions && expandedRow === row.id && (
-                    <tr key={`expanded-${row.id}`}>
+                    <tr>
                       <td
                         colSpan={columns.length + (renderActions ? 1 : 0)}
                         className="px-4 py-4 bg-secondary/20"
@@ -120,7 +119,7 @@ export function AdminTable({
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))
             )}
           </tbody>

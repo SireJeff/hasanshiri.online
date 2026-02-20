@@ -3,6 +3,7 @@
 import { AdminTable } from '@/components/admin/shared/admin-table'
 import Link from 'next/link'
 import { Pencil, Trash2, Github as GithubIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 /**
  * Projects Table Component
