@@ -37,14 +37,14 @@ export function ArticleJsonLd({ article, locale = 'en', url }) {
     author: {
       '@type': 'Person',
       name: article.author?.full_name || NAME_VARIANTS.primary.en,
-      url: 'https://hasanshiri.online',
+      url: 'https://www.hasanshiri.online',
     },
     publisher: {
       '@type': 'Organization',
       name: NAME_VARIANTS.short.en,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://hasanshiri.online/logo.png',
+        url: 'https://www.hasanshiri.online/logo.png',
       },
     },
     mainEntityOfPage: {
@@ -87,8 +87,8 @@ export function PersonJsonLd({ locale = 'en' }) {
     '@type': 'Person',
     name: NAME_VARIANTS.primary[locale],
     alternateName: getPersonSchemaAlternateNames(),
-    url: 'https://hasanshiri.online',
-    image: 'https://hasanshiri.online/your-photo.jpg',
+    url: 'https://www.hasanshiri.online',
+    image: 'https://www.hasanshiri.online/your-photo.jpg',
     jobTitle: isRtl ? 'دانشجوی فیزیک و دانشمند داده' : 'Physics Student & Data Scientist',
     worksFor: {
       '@type': 'Organization',
@@ -120,8 +120,8 @@ export function OrganizationJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: NAME_VARIANTS.short.en,
-    url: 'https://hasanshiri.online',
-    logo: 'https://hasanshiri.online/logo.png',
+    url: 'https://www.hasanshiri.online',
+    logo: 'https://www.hasanshiri.online/logo.png',
     sameAs: getSameAsArray(),
   }
 
@@ -143,13 +143,13 @@ export function WebSiteJsonLd({ locale = 'en' }) {
       NAME_VARIANTS.initials.en,
       NAME_VARIANTS.short.fa,
     ],
-    url: 'https://hasanshiri.online',
+    url: 'https://www.hasanshiri.online',
     inLanguage: ['en-US', 'fa-IR'],
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `https://hasanshiri.online/${locale}/blog?search={search_term_string}`,
+        urlTemplate: `https://www.hasanshiri.online/${locale}/blog?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -169,17 +169,17 @@ export function BlogJsonLd({ locale = 'en' }) {
     description: isRtl
       ? 'مقالاتی درباره فناوری، علم داده، فیزیک و سیستم‌های پیچیده'
       : 'Articles about technology, data science, physics, and complex systems',
-    url: `https://hasanshiri.online/${locale}/blog`,
+    url: `https://www.hasanshiri.online/${locale}/blog`,
     inLanguage: isRtl ? 'fa-IR' : 'en-US',
     author: {
       '@type': 'Person',
       name: NAME_VARIANTS.primary.en,
-      url: 'https://hasanshiri.online',
+      url: 'https://www.hasanshiri.online',
     },
     publisher: {
       '@type': 'Organization',
       name: NAME_VARIANTS.short.en,
-      url: 'https://hasanshiri.online',
+      url: 'https://www.hasanshiri.online',
     },
   }
 
@@ -210,7 +210,7 @@ export function FAQJsonLd({ faqs, locale = 'en' }) {
 // Project JSON-LD for SoftwareSourceCode schema
 export function ProjectJsonLd({ project, locale = 'en' }) {
   const isRtl = locale === 'fa'
-  const baseUrl = 'https://hasanshiri.online'
+  const baseUrl = 'https://www.hasanshiri.online'
   const projectUrl = `${baseUrl}/${locale}/projects/${project.slug}`
 
   const title = isRtl
@@ -264,8 +264,8 @@ export async function PersonJsonLdDynamic({ locale = 'en' }) {
     '@type': 'Person',
     name: NAME_VARIANTS.primary[locale],
     alternateName: getPersonSchemaAlternateNames(),
-    url: 'https://hasanshiri.online',
-    image: 'https://hasanshiri.online/your-photo.jpg',
+    url: 'https://www.hasanshiri.online',
+    image: 'https://www.hasanshiri.online/your-photo.jpg',
     jobTitle: isRtl ? 'دانشجوی فیزیک و دانشمند داده' : 'Physics Student & Data Scientist',
     worksFor: {
       '@type': 'Organization',

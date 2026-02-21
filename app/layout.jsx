@@ -6,7 +6,7 @@ import PWARegistrar from './components/pwa-registrar'
 
 // Root metadata - will be overridden by locale layouts
 export const metadata = {
-  metadataBase: new URL('https://hasanshiri.online'),
+  metadataBase: new URL('https://www.hasanshiri.online'),
   title: {
     default: 'Mohammad Hassan Shiri | Portfolio & Blog',
     template: '%s | Mohammad Hassan Shiri',

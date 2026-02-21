@@ -2,7 +2,7 @@ import { getAllArticlesForSitemap } from '@/lib/actions/articles'
 import { getAllProjectSlugs } from '@/lib/actions/projects'
 import { i18nConfig } from '@/lib/i18n-config'
 
-const getBaseUrl = () => process.env.NEXT_PUBLIC_SITE_URL || 'https://hasanshiri.online'
+const getBaseUrl = () => process.env.NEXT_PUBLIC_SITE_URL || 'https://www.hasanshiri.online'
 
 export default async function sitemap() {
   const baseUrl = getBaseUrl()

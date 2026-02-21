@@ -18,7 +18,7 @@ export function Breadcrumbs({ items, locale = 'en' }) {
       position: index + 1,
       name: item.label,
       ...(item.href && {
-        item: `https://hasanshiri.online${item.href}`,
+        item: `https://www.hasanshiri.online${item.href}`,
       }),
     })),
   }

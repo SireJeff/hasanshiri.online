@@ -11,7 +11,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url)
   const locale = searchParams.get('locale') || 'en'
   const isRtl = locale === 'fa'
-  const baseUrl = 'https://hasanshiri.online'
+  const baseUrl = 'https://www.hasanshiri.online'
 
   // Fetch all dynamic data in parallel
   const [skillsGrouped, projectSlugs, articles] = await Promise.all([

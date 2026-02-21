@@ -3,7 +3,7 @@
 import { getArticles } from '@/lib/actions/articles'
 import { NAME_VARIANTS } from '@/lib/config/seo-config'
 
-const BASE_URL = 'https://hasanshiri.online'
+const BASE_URL = 'https://www.hasanshiri.online'
 
 export async function GET() {
   const { articles } = await getArticles({ limit: 50 })

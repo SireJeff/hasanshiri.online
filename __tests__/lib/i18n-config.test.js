@@ -87,23 +87,23 @@ describe('i18n-config', () => {
   describe('generateAlternateUrls', () => {
     it('should generate correct alternate URLs for root path', () => {
       const result = generateAlternateUrls('/')
-      expect(result.canonical).toBe('https://hasanshiri.online/en/')
-      expect(result.languages.en).toBe('https://hasanshiri.online/en/')
-      expect(result.languages.fa).toBe('https://hasanshiri.online/fa/')
-      expect(result.languages['x-default']).toBe('https://hasanshiri.online/en/')
+      expect(result.canonical).toBe('https://www.hasanshiri.online/en/')
+      expect(result.languages.en).toBe('https://www.hasanshiri.online/en/')
+      expect(result.languages.fa).toBe('https://www.hasanshiri.online/fa/')
+      expect(result.languages['x-default']).toBe('https://www.hasanshiri.online/en/')
     })
 
     it('should generate correct alternate URLs for blog path', () => {
       const result = generateAlternateUrls('/blog')
-      expect(result.canonical).toBe('https://hasanshiri.online/en/blog')
-      expect(result.languages.en).toBe('https://hasanshiri.online/en/blog')
-      expect(result.languages.fa).toBe('https://hasanshiri.online/fa/blog')
+      expect(result.canonical).toBe('https://www.hasanshiri.online/en/blog')
+      expect(result.languages.en).toBe('https://www.hasanshiri.online/en/blog')
+      expect(result.languages.fa).toBe('https://www.hasanshiri.online/fa/blog')
     })
 
     it('should strip existing locale prefix', () => {
       const result = generateAlternateUrls('/en/blog/my-article')
-      expect(result.canonical).toBe('https://hasanshiri.online/en/blog/my-article')
-      expect(result.languages.fa).toBe('https://hasanshiri.online/fa/blog/my-article')
+      expect(result.canonical).toBe('https://www.hasanshiri.online/en/blog/my-article')
+      expect(result.languages.fa).toBe('https://www.hasanshiri.online/fa/blog/my-article')
     })
 
     it('should work with custom base URL', () => {

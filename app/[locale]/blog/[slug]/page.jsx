@@ -37,7 +37,7 @@ export async function generateMetadata({ params }) {
   }
 
   const isRtl = locale === 'fa'
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hasanshiri.online'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.hasanshiri.online'
   const alternates = generateAlternateUrls(`/blog/${slug}`, baseUrl)
 
   const title = isRtl
@@ -124,7 +124,7 @@ export default async function ArticlePage({ params }) {
       )
     : null
 
-  const articleUrl = `https://hasanshiri.online/${locale}/blog/${article.slug}`
+  const articleUrl = `https://www.hasanshiri.online/${locale}/blog/${article.slug}`
 
   // Breadcrumb items
   const breadcrumbItems = [
