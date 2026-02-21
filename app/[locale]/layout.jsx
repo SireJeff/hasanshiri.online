@@ -85,6 +85,16 @@ export async function generateMetadata({ params }) {
       canonical: `${baseUrl}/${locale}`,
       languages: alternates.languages,
     },
+    links: {
+      alternate: [
+        {
+          rel: 'alternate',
+          type: 'application/rss+xml',
+          title: 'Hasan Shiri Blog RSS Feed',
+          href: `${baseUrl}/api/feed`,
+        },
+      ],
+    },
     openGraph: {
       type: 'website',
       locale: isRtl ? 'fa_IR' : 'en_US',
