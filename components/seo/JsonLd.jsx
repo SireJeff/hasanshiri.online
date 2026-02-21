@@ -206,3 +206,89 @@ export function FAQJsonLd({ faqs, locale = 'en' }) {
 
   return <JsonLdScript data={data} />
 }
+
+// Project JSON-LD for SoftwareSourceCode schema
+export function ProjectJsonLd({ project, locale = 'en' }) {
+  const isRtl = locale === 'fa'
+  const baseUrl = 'https://hasanshiri.online'
+  const projectUrl = `${baseUrl}/${locale}/projects/${project.slug}`
+
+  const title = isRtl
+    ? (project.title_fa || project.title_en)
+    : project.title_en
+  const description = isRtl
+    ? (project.description_fa || project.description_en)
+    : project.description_en
+
+  const keywords = [
+    ...(project.tech_stack || []),
+    ...(project.tags?.map(t => isRtl ? (t.name_fa || t.name_en) : t.name_en) || [])
+  ]
+
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    name: title,
+    description: description,
+    url: projectUrl,
+    codeRepository: project.github_url,
+    ...(project.demo_url && { screenshot: project.demo_url }),
+    ...(project.github_language && { programmingLanguage: project.github_language }),
+    ...(keywords.length > 0 && { keywords: keywords.join(', ') }),
+    ...(project.created_at && { dateCreated: project.created_at }),
+    ...(project.updated_at && { dateModified: project.updated_at }),
+    author: {
+      '@type': 'Person',
+      name: 'Mohammad Hassan Shiri',
+      url: baseUrl
+    },
+  }
+
+  return <JsonLdScript data={data} />
+}
+
+// Dynamic Person JSON-LD with database skills (Async Component)
+export async function PersonJsonLdDynamic({ locale = 'en' }) {
+  const isRtl = locale === 'fa'
+
+  // Dynamic import to avoid issues
+  const { getSkillsGroupedByCategory } = await import('@/lib/actions/skills')
+  const skillsGrouped = await getSkillsGroupedByCategory()
+
+  const skillNames = skillsGrouped.flatMap(group =>
+    group.skills.map(skill => isRtl ? (skill.name_fa || skill.name_en) : skill.name_en)
+  )
+
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: NAME_VARIANTS.primary[locale],
+    alternateName: getPersonSchemaAlternateNames(),
+    url: 'https://hasanshiri.online',
+    image: 'https://hasanshiri.online/your-photo.jpg',
+    jobTitle: isRtl ? 'دانشجوی فیزیک و دانشمند داده' : 'Physics Student & Data Scientist',
+    worksFor: {
+      '@type': 'Organization',
+      name: ORGANIZATIONS.sharif.name[locale],
+      url: ORGANIZATIONS.sharif.url,
+    },
+    alumniOf: {
+      '@type': 'Organization',
+      name: ORGANIZATIONS.sharif.name.en,
+      url: ORGANIZATIONS.sharif.url,
+    },
+    knowsAbout: skillNames,
+    sameAs: getSameAsArray(),
+    hasCredential: {
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'Bachelor Degree',
+      recognizedBy: {
+        '@type': 'Organization',
+        name: ORGANIZATIONS.sharif.name[locale],
+      },
+      about: 'Physics',
+    },
+  }
+
+  return <JsonLdScript data={data} />
+}

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getProjectBySlug } from '@/lib/actions/projects'
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs'
+import { ProjectJsonLd } from '@/components/seo/JsonLd'
 import { ArrowLeft, Calendar, ExternalLink, Github, Tag, Home } from 'lucide-react'
 import { generateAlternateUrls } from '@/lib/i18n-config'
 
@@ -95,7 +96,11 @@ export default async function ProjectPage({ params }) {
   ]
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      {/* JSON-LD Structured Data */}
+      <ProjectJsonLd project={project} locale={locale} />
+
+      <div className="min-h-screen bg-background">
       {/* Header / Hero */}
       <header className="relative">
         {/* Featured Image */}
@@ -254,5 +259,6 @@ export default async function ProjectPage({ params }) {
         </div>
       </main>
     </div>
+    </>
   )
 }
