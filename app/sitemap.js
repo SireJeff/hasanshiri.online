@@ -2,9 +2,11 @@ import { getAllArticlesForSitemap } from '@/lib/actions/articles'
 import { getAllProjectSlugs } from '@/lib/actions/projects'
 import { i18nConfig } from '@/lib/i18n-config'
 
-const baseUrl = 'https://hasanshiri.online'
+const getBaseUrl = () => process.env.NEXT_PUBLIC_SITE_URL || 'https://hasanshiri.online'
 
 export default async function sitemap() {
+  const baseUrl = getBaseUrl()
+
   // Get all published articles and projects
   const [articles, projectSlugs] = await Promise.all([
     getAllArticlesForSitemap(),
@@ -48,14 +50,14 @@ export default async function sitemap() {
 
   // Generate project entries for all locales
   const projectEntries = i18nConfig.locales.flatMap((locale) =>
-    projectSlugs.map((slug) => ({
-      url: `${baseUrl}/${locale}/projects/${slug}`,
-      lastModified: new Date(),
+    projectSlugs.map((project) => ({
+      url: `${baseUrl}/${locale}/projects/${project.slug}`,
+      lastModified: project.updated_at || new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
       alternates: {
         languages: i18nConfig.locales.reduce((acc, loc) => {
-          acc[loc] = `${baseUrl}/${loc}/projects/${slug}`
+          acc[loc] = `${baseUrl}/${loc}/projects/${project.slug}`
           return acc
         }, {}),
       },

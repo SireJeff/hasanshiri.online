@@ -289,7 +289,7 @@ export async function PersonJsonLdDynamic({ locale = 'en' }) {
       about: 'Physics',
     },
     hasSkill: skillsGrouped.flatMap(group =>
-      group.skills.slice(0, 10).map(skill => ({
+      group.skills.map(skill => ({
         '@type': 'Skill',
         name: isRtl ? (skill.name_fa || skill.name_en) : skill.name_en,
         ...(skill.proficiency_level && {
@@ -312,17 +312,11 @@ export function SpeakableJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'SpeakableSpecification',
     cssSelector: [
-      '#hero h1',
-      '#hero p',
-      '#about h2',
-      '#about p',
-      '#skills h2',
-    ],
-    xpath: [
-      '/html/body/main/section[@id="hero"]/h1',
-      '/html/body/main/section[@id="hero"]/p',
-      '/html/body/main/section[@id="about"]/div/h2',
-      '/html/body/main/section[@id="about"]/div/p',
+      'section#hero p',          // Hero paragraphs (H1 is sr-only/screen reader only)
+      'section#about h2',        // About heading
+      'section#about p',         // About paragraphs
+      'section#skills h2',       // Skills heading
+      'section#contact h2',      // Contact heading
     ],
   }
 

@@ -37,7 +37,7 @@ export async function generateMetadata({ params }) {
   }
 
   const isRtl = locale === 'fa'
-  const baseUrl = 'https://hasanshiri.online'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hasanshiri.online'
   const alternates = generateAlternateUrls(`/blog/${slug}`, baseUrl)
 
   const title = isRtl

@@ -21,7 +21,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { locale } = await params
   const isRtl = locale === 'fa'
-  const baseUrl = 'https://hasanshiri.online'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hasanshiri.online'
   const alternates = generateAlternateUrls('/blog', baseUrl)
 
   const titles = {

@@ -9,7 +9,7 @@ import { ProjectsSection } from '@/components/ProjectsSection'
 import { ArticlesSection } from '@/components/ArticlesSection'
 import { ContactSection } from '@/components/ContactSection'
 import { Footer } from '@/components/Footer'
-import { PersonJsonLd, WebSiteJsonLd, OrganizationJsonLd } from '@/components/seo/JsonLd'
+import { PersonJsonLd, WebSiteJsonLd, OrganizationJsonLd, SpeakableJsonLd } from '@/components/seo/JsonLd'
 import Image from 'next/image'
 
 export function HomePage({ locale = 'en' }) {
@@ -21,6 +21,7 @@ export function HomePage({ locale = 'en' }) {
       <PersonJsonLd locale={locale} />
       <WebSiteJsonLd locale={locale} />
       <OrganizationJsonLd />
+      <SpeakableJsonLd />
 
       <StarBackground />
 

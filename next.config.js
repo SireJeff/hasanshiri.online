@@ -28,6 +28,7 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
+  trailingSlash: false, // Explicit trailing slash policy for SEO consistency
   images: {
     remotePatterns: [
       {

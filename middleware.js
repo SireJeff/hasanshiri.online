@@ -67,6 +67,19 @@ function shouldSkipLocale(pathname) {
   )
 }
 
+// Check for legacy ?lang= query parameter
+function getLegacyLangParam(request) {
+  try {
+    const langParam = request.nextUrl.searchParams.get('lang')
+    if (langParam && i18nConfig.locales.includes(langParam)) {
+      return langParam
+    }
+  } catch (e) {
+    console.error('Error getting legacy lang param:', e)
+  }
+  return null
+}
+
 // Handle Supabase session update
 async function handleSupabaseSession(request, response) {
   // Skip if Supabase env vars are not configured
@@ -124,8 +137,53 @@ export async function middleware(request) {
   try {
     const { pathname } = request.nextUrl
 
+    // === CANONICALIZATION REDIRECTS (SEO) ===
+
+    // WWW to non-WWW canonicalization
+    const hostname = request.headers.get('host') || ''
+    const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1')
+    const isProduction = process.env.NODE_ENV === 'production'
+
+    if (hostname.startsWith('www.') && isProduction && !isLocalhost) {
+      const nonWwwHostname = hostname.replace(/^www\./, '')
+      const url = request.nextUrl.clone()
+      url.hostname = nonWwwHostname
+      url.protocol = 'https:'
+      return NextResponse.redirect(url, 301)
+    }
+
+    // HTTPS enforcement
+    const protocol = request.headers.get('x-forwarded-proto') ||
+                     (request.nextUrl.protocol === 'http:' ? 'http' : 'https')
+    if (protocol === 'http' && isProduction && !isLocalhost) {
+      const url = request.nextUrl.clone()
+      url.protocol = 'https:'
+      return NextResponse.redirect(url, 301)
+    }
+
     // Handle locale routing for public pages
     if (!shouldSkipLocale(pathname)) {
+      // Handle legacy ?lang= query parameter migration
+      const legacyLang = getLegacyLangParam(request)
+
+      if (legacyLang) {
+        const redirectPath = pathname === '/'
+          ? `/${legacyLang}`
+          : `/${legacyLang}${pathname}`
+
+        const url = request.nextUrl.clone()
+        url.pathname = redirectPath
+        url.search = '' // Remove all query params
+
+        const response = NextResponse.redirect(url, 301)
+        response.cookies.set('NEXT_LOCALE', legacyLang, {
+          maxAge: 60 * 60 * 24 * 365,
+          path: '/',
+          sameSite: 'lax',
+        })
+        return response
+      }
+
       // Check if pathname has a valid locale prefix
       const pathnameHasLocale = i18nConfig.locales.some(
         (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
@@ -144,7 +202,7 @@ export async function middleware(request) {
         const url = request.nextUrl.clone()
         url.pathname = redirectPath
 
-        const response = NextResponse.redirect(url)
+        const response = NextResponse.redirect(url, 301)
         response.cookies.set('NEXT_LOCALE', preferredLocale, {
           maxAge: 60 * 60 * 24 * 365,
           path: '/',
