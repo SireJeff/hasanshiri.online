@@ -138,28 +138,8 @@ export async function middleware(request) {
     const { pathname } = request.nextUrl
 
     // === CANONICALIZATION REDIRECTS (SEO) ===
-
-    // WWW to non-WWW canonicalization
-    const hostname = request.headers.get('host') || ''
-    const isLocalhost = hostname.includes('localhost') || hostname.includes('127.0.0.1')
-    const isProduction = process.env.NODE_ENV === 'production'
-
-    if (hostname.startsWith('www.') && isProduction && !isLocalhost) {
-      const nonWwwHostname = hostname.replace(/^www\./, '')
-      const url = request.nextUrl.clone()
-      url.hostname = nonWwwHostname
-      url.protocol = 'https:'
-      return NextResponse.redirect(url, 301)
-    }
-
-    // HTTPS enforcement
-    const protocol = request.headers.get('x-forwarded-proto') ||
-                     (request.nextUrl.protocol === 'http:' ? 'http' : 'https')
-    if (protocol === 'http' && isProduction && !isLocalhost) {
-      const url = request.nextUrl.clone()
-      url.protocol = 'https:'
-      return NextResponse.redirect(url, 301)
-    }
+    // NOTE: WWW canonicalization is handled by Vercel at the edge level.
+    // Do NOT add www redirects here to avoid redirect loops.
 
     // Handle locale routing for public pages
     if (!shouldSkipLocale(pathname)) {
