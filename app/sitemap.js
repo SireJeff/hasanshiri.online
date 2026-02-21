@@ -1,11 +1,15 @@
 import { getAllArticlesForSitemap } from '@/lib/actions/articles'
+import { getAllProjectSlugs } from '@/lib/actions/projects'
 import { i18nConfig } from '@/lib/i18n-config'
 
 const baseUrl = 'https://hasanshiri.online'
 
 export default async function sitemap() {
-  // Get all published articles
-  const articles = await getAllArticlesForSitemap()
+  // Get all published articles and projects
+  const [articles, projectSlugs] = await Promise.all([
+    getAllArticlesForSitemap(),
+    getAllProjectSlugs(),
+  ])
 
   // Static pages for each locale
   const staticPages = ['', '/blog']
@@ -42,8 +46,22 @@ export default async function sitemap() {
     }))
   )
 
+  // Generate project entries for all locales
+  const projectEntries = i18nConfig.locales.flatMap((locale) =>
+    projectSlugs.map((slug) => ({
+      url: `${baseUrl}/${locale}/projects/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+      alternates: {
+        languages: i18nConfig.locales.reduce((acc, loc) => {
+          acc[loc] = `${baseUrl}/${loc}/projects/${slug}`
+          return acc
+        }, {}),
+      },
+    }))
+  )
+
   // Combine all entries
-  // Note: Projects are displayed on homepage, not as separate pages yet
-  // When project detail pages are added, include them here
-  return [...staticEntries, ...articleEntries]
+  return [...staticEntries, ...articleEntries, ...projectEntries]
 }
