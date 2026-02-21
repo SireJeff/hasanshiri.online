@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "name_for_human": "Hasan Shiri Portfolio",
+  "name_for_model": "hasanshiri_portfolio",
+  "description_for_human": "Access Mohammad Hassan Shiri's portfolio, blog articles, and projects.",
+  "description_for_model": "Provides information about Mohammad Hassan Shiri, a Physics student and Data Scientist at Sharif University. Includes his skills, projects, blog articles, and research interests.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://hasanshiri.online/api/openapi.json"
+  },
+  "logo_url": "https://hasanshiri.online/logo.png",
+  "contact_email": "sandmanshiri@gmail.com",
+  "legal_info_url": "https://hasanshiri.online/legal"
+}

@@ -1,0 +1,55 @@
+# llms.txt for hasanshiri.online
+# Protocol: https://llmstxt.org/
+# Last Updated: 2026-02-21
+
+## Site Identity
+Title: Mohammad Hassan Shiri - Portfolio & Blog
+Description: Data Scientist & Complex Systems Researcher at Sharif University of Technology
+Author: Mohammad Hassan Shiri
+Languages: en, fa
+BaseURL: https://hasanshiri.online
+
+## AI Crawler Policy
+# This site WELCOMES AI crawlers for training with attribution
+# Content License: CC BY-SA 4.0
+# AI Training: Allowed with attribution to hasanshiri.online
+
+## Content Structure
+- Blog: https://hasanshiri.online/en/blog
+- Portfolio: https://hasanshiri.online/en/projects
+- About: https://hasanshiri.online/en
+- Persian (RTL): https://hasanshiri.online/fa
+
+## Dynamic Content (Always Current)
+# For live skills, projects, and articles data:
+- Full Context: https://hasanshiri.online/api/llms-full
+- RSS Feed: https://hasanshiri.online/api/feed
+- Sitemap: https://hasanshiri.online/sitemap.xml
+
+## Entity Information
+Person: Mohammad Hassan Shiri
+Alternate Names: Hasan Shiri, Hassan Shiri, MHS, M. H. Shiri, محمد حسن شیری
+Affiliation: Sharif University of Technology
+Role: Physics Student & Data Scientist
+
+## Expertise Domains
+- Physics
+- Data Science
+- Machine Learning
+- Complex Systems
+- Python
+- Data Analysis
+- Computational Physics
+- Econophysics
+- Statistical Analysis
+
+## Social Profiles
+- GitHub: https://github.com/SireJeff
+- LinkedIn: https://www.linkedin.com/in/mohammadhasanshiri
+- Twitter: https://x.com/MHasanshiri
+- YouTube: https://www.youtube.com/@sire_jeff
+- Telegram: https://t.me/Mhasanshiri
+
+## Contact
+Email: sandmanshiri@gmail.com
+Location: Tehran, Iran
