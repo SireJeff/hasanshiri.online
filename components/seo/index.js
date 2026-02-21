@@ -8,4 +8,6 @@ export {
   BlogJsonLd,
   FAQJsonLd,
   ProjectJsonLd,
+  SpeakableJsonLd,
+  HowToJsonLd,
 } from './JsonLd'

@@ -288,6 +288,64 @@ export async function PersonJsonLdDynamic({ locale = 'en' }) {
       },
       about: 'Physics',
     },
+    hasSkill: skillsGrouped.flatMap(group =>
+      group.skills.slice(0, 10).map(skill => ({
+        '@type': 'Skill',
+        name: isRtl ? (skill.name_fa || skill.name_en) : skill.name_en,
+        ...(skill.proficiency_level && {
+          proficiency: {
+            '@type': 'QuantitativeValue',
+            value: skill.proficiency_level,
+            unitText: 'Percent',
+          },
+        }),
+      }))
+    ),
+  }
+
+  return <JsonLdScript data={data} />
+}
+
+// SpeakableSpecification for voice search optimization
+export function SpeakableJsonLd() {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'SpeakableSpecification',
+    cssSelector: [
+      '#hero h1',
+      '#hero p',
+      '#about h2',
+      '#about p',
+      '#skills h2',
+    ],
+    xpath: [
+      '/html/body/main/section[@id="hero"]/h1',
+      '/html/body/main/section[@id="hero"]/p',
+      '/html/body/main/section[@id="about"]/div/h2',
+      '/html/body/main/section[@id="about"]/div/p',
+    ],
+  }
+
+  return <JsonLdScript data={data} />
+}
+
+// HowTo schema for tutorial content (future use)
+export function HowToJsonLd({ howTo, locale = 'en' }) {
+  const isRtl = locale === 'fa'
+
+  if (!howTo?.steps?.length) return null
+
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: isRtl ? (howTo.name_fa || howTo.name_en) : howTo.name_en,
+    description: isRtl ? (howTo.description_fa || howTo.description_en) : howTo.description_en,
+    step: howTo.steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: isRtl ? (step.name_fa || step.name_en) : step.name_en,
+      text: isRtl ? (step.text_fa || step.text_en) : step.text_en,
+    })),
   }
 
   return <JsonLdScript data={data} />
