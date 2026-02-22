@@ -1,6 +1,6 @@
 // Portfolio PWA Service Worker
 // Cache version - update this to invalidate all caches
-const CACHE_VERSION = 'v1'
+const CACHE_VERSION = 'v2'
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`
 
 // Static assets to cache on install
@@ -19,6 +19,10 @@ const CACHE_PATTERNS = {
   fonts: /\.(?:woff|woff2|ttf|otf|eot)$/,
   // API calls - network first, cache fallback
   api: /^\/api\//,
+  // Dynamic content - always fetch fresh (articles, projects, blog, admin)
+  dynamicContent: /\/(article|blog|project|admin|projects)/,
+  // Static assets that can be cached aggressively
+  staticAssets: /\.(?:js|css|json|xml|txt)$/,
 }
 
 // Cache strategies
@@ -107,9 +111,24 @@ function getStrategy(request) {
     return strategies.networkFirst
   }
 
-  // Static assets from same origin - stale while revalidate
-  if (url.origin === location.origin) {
+  // Dynamic content (articles, projects, blog, admin) - always network first for fresh data
+  if (CACHE_PATTERNS.dynamicContent.test(url.pathname)) {
+    return strategies.networkFirst
+  }
+
+  // Navigation requests (HTML pages) - network first to ensure fresh content
+  if (request.mode === 'navigate') {
+    return strategies.networkFirst
+  }
+
+  // Static JS/CSS files - stale while revalidate for performance
+  if (CACHE_PATTERNS.staticAssets.test(url.pathname)) {
     return strategies.staleWhileRevalidate
+  }
+
+  // Other same-origin requests - network first (safer default)
+  if (url.origin === location.origin) {
+    return strategies.networkFirst
   }
 
   return null
