@@ -1,0 +1,212 @@
+[
+  {
+    "slug": "python",
+    "name_en": "Python",
+    "name_fa": "پایتون",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "javascript",
+    "name_en": "JavaScript",
+    "name_fa": "جاوااسکریپت",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "typescript",
+    "name_en": "TypeScript",
+    "name_fa": "تایپ‌اسکریپت",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "sql",
+    "name_en": "SQL",
+    "name_fa": "اس‌کیو‌ال",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "bash",
+    "name_en": "Bash/Shell",
+    "name_fa": "بش",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "html-css",
+    "name_en": "HTML & CSS",
+    "name_fa": "اچ‌تی‌ام‌ال و سی‌اس‌اس",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "markdown",
+    "name_en": "Markdown",
+    "name_fa": "مارک‌داون",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "latex",
+    "name_en": "LaTeX",
+    "name_fa": "لاتک",
+    "category": "programming-languages"
+  },
+  {
+    "slug": "react",
+    "name_en": "React",
+    "name_fa": "ری‌اکت",
+    "category": "web-development"
+  },
+  {
+    "slug": "nextjs",
+    "name_en": "Next.js",
+    "name_fa": "نکست‌جی‌اس",
+    "category": "web-development"
+  },
+  {
+    "slug": "tailwind",
+    "name_en": "Tailwind CSS",
+    "name_fa": "تیلویند",
+    "category": "web-development"
+  },
+  {
+    "slug": "nodejs",
+    "name_en": "Node.js",
+    "name_fa": "نود‌جی‌اس",
+    "category": "web-development"
+  },
+  {
+    "slug": "api",
+    "name_en": "API Development",
+    "name_fa": "توسعه API",
+    "category": "web-development"
+  },
+  {
+    "slug": "frontend",
+    "name_en": "Frontend",
+    "name_fa": "فرانت‌اند",
+    "category": "web-development"
+  },
+  {
+    "slug": "machine-learning",
+    "name_en": "Machine Learning",
+    "name_fa": "یادگیری ماشین",
+    "category": "data-science"
+  },
+  {
+    "slug": "deep-learning",
+    "name_en": "Deep Learning",
+    "name_fa": "یادگیری عمیق",
+    "category": "data-science"
+  },
+  {
+    "slug": "data-visualization",
+    "name_en": "Data Visualization",
+    "name_fa": "مصورسازی داده",
+    "category": "data-science"
+  },
+  {
+    "slug": "pandas",
+    "name_en": "Pandas",
+    "name_fa": "پانداس",
+    "category": "data-science"
+  },
+  {
+    "slug": "numpy",
+    "name_en": "NumPy",
+    "name_fa": "نامپای",
+    "category": "data-science"
+  },
+  {
+    "slug": "matplotlib",
+    "name_en": "Matplotlib",
+    "name_fa": "مت‌پلات‌لیب",
+    "category": "data-science"
+  },
+  {
+    "slug": "jupyter",
+    "name_en": "Jupyter",
+    "name_fa": "جوپیتر",
+    "category": "data-science"
+  },
+  {
+    "slug": "computational-physics",
+    "name_en": "Computational Physics",
+    "name_fa": "فیزیک محاسباتی",
+    "category": "physics"
+  },
+  {
+    "slug": "simulation",
+    "name_en": "Simulation",
+    "name_fa": "شبیه‌سازی",
+    "category": "physics"
+  },
+  {
+    "slug": "complex-systems",
+    "name_en": "Complex Systems",
+    "name_fa": "سیستم‌های پیچیده",
+    "category": "physics"
+  },
+  {
+    "slug": "numerical-methods",
+    "name_en": "Numerical Methods",
+    "name_fa": "روش‌های عددی",
+    "category": "physics"
+  },
+  {
+    "slug": "research-paper",
+    "name_en": "Research Paper",
+    "name_fa": "مقاله پژوهشی",
+    "category": "physics"
+  },
+  {
+    "slug": "docker",
+    "name_en": "Docker",
+    "name_fa": "داکر",
+    "category": "devops"
+  },
+  {
+    "slug": "git",
+    "name_en": "Git & GitHub",
+    "name_fa": "گیت و گیت‌هاب",
+    "category": "devops"
+  },
+  {
+    "slug": "linux",
+    "name_en": "Linux",
+    "name_fa": "لینوکس",
+    "category": "devops"
+  },
+  {
+    "slug": "ci-cd",
+    "name_en": "CI/CD",
+    "name_fa": "CI/CD",
+    "category": "devops"
+  },
+  {
+    "slug": "vercel",
+    "name_en": "Vercel",
+    "name_fa": "ورسل",
+    "category": "devops"
+  },
+  {
+    "slug": "automation",
+    "name_en": "Automation",
+    "name_fa": "اتوماسیون",
+    "category": "special"
+  },
+  {
+    "slug": "telegram-bot",
+    "name_en": "Telegram Bot",
+    "name_fa": "ربات تلگرام",
+    "category": "special"
+  },
+  {
+    "slug": "international-trade",
+    "name_en": "International Trade",
+    "name_fa": "تجارت بین‌الملل",
+    "category": "special"
+  },
+  {
+    "slug": "persian",
+    "name_en": "Persian Content",
+    "name_fa": "محتوای فارسی",
+    "category": "special"
+  }
+]

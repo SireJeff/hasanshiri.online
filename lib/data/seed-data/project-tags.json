@@ -1,0 +1,52 @@
+[
+  {
+    "slug": "supabase",
+    "name_en": "Supabase",
+    "name_fa": "سوپابیس"
+  },
+  {
+    "slug": "api-integration",
+    "name_en": "API Integration",
+    "name_fa": "یکپارچه‌سازی API"
+  },
+  {
+    "slug": "bot",
+    "name_en": "Bot/Application",
+    "name_fa": "ربات/اپلیکیشن"
+  },
+  {
+    "slug": "portfolio",
+    "name_en": "Portfolio",
+    "name_fa": "پورتفولیو"
+  },
+  {
+    "slug": "cms",
+    "name_en": "CMS",
+    "name_fa": "سیستم مدیریت محتوا"
+  },
+  {
+    "slug": "authentication",
+    "name_en": "Authentication",
+    "name_fa": "احراز هویت"
+  },
+  {
+    "slug": "realtime",
+    "name_en": "Real-time",
+    "name_fa": "بلادرنگ"
+  },
+  {
+    "slug": "seo",
+    "name_en": "SEO",
+    "name_fa": "سئو"
+  },
+  {
+    "slug": "open-source",
+    "name_en": "Open Source",
+    "name_fa": "متن‌باز"
+  },
+  {
+    "slug": "tip tap",
+    "name_en": "TipTap Editor",
+    "name_fa": "ویرایشگر تیپ‌تپ"
+  }
+]

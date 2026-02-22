@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "tutorials",
+    "name_en": "Tutorials",
+    "name_fa": "آموزش‌ها",
+    "description_en": "Step-by-step guides and how-tos for developers and researchers",
+    "description_fa": "راهنماهای گام‌به‌گام و آموزش‌ها برای توسعه‌دهندگان و پژوهشگران",
+    "color": "#06b6d4",
+    "sort_order": 5
+  },
+  {
+    "slug": "projects",
+    "name_en": "Projects",
+    "name_fa": "پروژه‌ها",
+    "description_en": "Project showcases, case studies, and development stories",
+    "description_fa": "معرفی پروژه‌ها، مطالعات موردی و داستان‌های توسعه",
+    "color": "#84cc16",
+    "sort_order": 6
+  },
+  {
+    "slug": "career",
+    "name_en": "Career",
+    "name_fa": "مسیر شغلی",
+    "description_en": "Career development, professional growth, and industry insights",
+    "description_fa": "توسعه شغلی، رشد حرفه‌ای و بینش‌های صنعتی",
+    "color": "#f43f5e",
+    "sort_order": 7
+  },
+  {
+    "slug": "research",
+    "name_en": "Research",
+    "name_fa": "پژوهش",
+    "description_en": "Academic research findings, papers, and scientific explorations",
+    "description_fa": "یافته‌های پژوهشی، مقالات و کاوش‌های علمی",
+    "color": "#6366f1",
+    "sort_order": 8
+  }
+]
